@@ -3,6 +3,11 @@
 
 class Qrcode:
 
-    def generate(self):
+    def init(self, message):
         return
 
+    def resize(self, size):
+        return
+
+    def generate(self):
+        return
