@@ -3,22 +3,32 @@ from PIL import Image
 
 
 class Qrcode:
-    def resize(self, size):
-        return
+    qrcode = None
 
-    def generate(self):
+    def resize(self, size):
+        return self.qrcode
+
+    def generate(self, path):
+        self.qrcode.save(path)
         return
 
     def __init__(self, message):
-        def draw():
+        def decide_version(message):
+            return version
+
+        def draw(size, data):
             def build_locate_sign():
                 return
 
             def build_time_sign():
                 return
-            return
 
-        def encode():
+            def draw_data():
+                return
+
+            return qrcode
+
+        def encode(message):
             def rs():
                 return
 
@@ -27,5 +37,9 @@ class Qrcode:
 
             def penalty():
                 return
-            return
-        return
+
+            return qrcode
+
+        version = decide_version(message)
+        encode_data = encode(message)
+        self.qrcode = draw(version, encode_data)
