@@ -4,6 +4,10 @@ from PIL import Image
 
 class Qrcode:
     qrcode = None
+    version = None
+    encode_data = None
+    data_matrix = None
+    size = ()
 
     def resize(self, size):
         self.qrcode.resize((size, size), Image.ANTIALIAS)
@@ -15,25 +19,29 @@ class Qrcode:
 
     def __init__(self, message):
         def decide_version(message):
-            _version = 0
-            return _version
+            self.version = 1
+            self.size = (21, 21)
 
-        def draw(size, data_matrix):
+        def draw():
             def build_locate_sign():
                 return
 
             def build_time_sign():
                 return
 
-            def data_to_draw(_data):
+            def build_version_sign():
                 return
 
-            self.qrcode = Image.new('1', (size, size), 1)
+            def data_to_draw():
+                return
+
+            self.qrcode = Image.new('1', self.size, 1)
             build_locate_sign()
             build_time_sign()
-            data_to_draw(data_matrix)
+            build_version_sign()
+            data_to_draw()
 
-        def encode(data_to_encode):
+        def encode():
             def rs(_data):
                 return _data
 
@@ -43,9 +51,8 @@ class Qrcode:
             def penalty(_data):
                 return _data
 
-            data_matrix = penalty(mask(rs(data_to_encode)))
-            return data_matrix
+            self.data_matrix = penalty(mask(rs(self.encode_data)))
 
-        version = decide_version(message)
-        encode_data = encode(message)
-        draw(version, encode_data)
+        decide_version(message)
+        encode()
+        draw()
