@@ -2,6 +2,7 @@
 from PIL import Image
 from math import sqrt
 from .constant import level_index
+from .constant import format_info_str
 from .constant import version_info_str
 from .constant import alignment_location
 
@@ -12,7 +13,7 @@ class Qrcode:
     version = None
     encode_data = None
     data_matrix = None
-    mask = None
+    mask_id = None
     length = 0
     size = ()
 
@@ -79,7 +80,13 @@ class Qrcode:
                             self.qrcode.putpixel((point_matrix[index][0] + 2, point_matrix[index][1] + offset), 0)
 
             def level_and_mask_draw():
-                return
+                for format_i in range(len(format_info_str[self.level][self.mask_id])):
+                    self.qrcode.putpixel((format_i if format_i < 6 else (
+                        format_i + 1 if format_i < 8 else self.length + (5 - format_i)), 8), 1 - int(
+                        format_info_str[self.level][self.mask_id][format_i]))
+                    # todo
+                    self.qrcode.putpixel((8, format_i), 1 - int(format_info_str[self.level][self.mask_id][format_i]))
+                self.qrcode.putpixel((self.length - 8, 8), 1 - int(format_info_str[self.level][self.mask_id][7]))
 
             def version_info_draw():
                 if self.version > 6:
@@ -107,9 +114,9 @@ class Qrcode:
                 return _data
 
             def penalty(_data):
-                return None, None
+                return 0, 0
 
-            (self.data_matrix, self.mask) = penalty(mask(rs(self.encode_data)))
+            (self.data_matrix, self.mask_id) = penalty(mask(rs(self.encode_data)))
 
         decide_version(message)
         encode()
