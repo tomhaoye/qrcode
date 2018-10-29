@@ -82,10 +82,11 @@ class Qrcode:
             def level_and_mask_draw():
                 for format_i in range(len(format_info_str[self.level][self.mask_id])):
                     self.qrcode.putpixel((format_i if format_i < 6 else (
-                        format_i + 1 if format_i < 8 else self.length + (5 - format_i)), 8), 1 - int(
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8)), 8), 1 - int(
                         format_info_str[self.level][self.mask_id][format_i]))
-                    # todo
-                    self.qrcode.putpixel((8, format_i), 1 - int(format_info_str[self.level][self.mask_id][format_i]))
+                    self.qrcode.putpixel((8, format_i if format_i < 6 else (
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))),
+                                         1 - int(format_info_str[self.level][self.mask_id][14 - format_i]))
                 self.qrcode.putpixel((self.length - 8, 8), 1 - int(format_info_str[self.level][self.mask_id][7]))
 
             def version_info_draw():
