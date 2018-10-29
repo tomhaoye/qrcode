@@ -1,13 +1,18 @@
 #!/usr/bin/python
 from PIL import Image
+from math import sqrt
+from .constant import level_index
+from .constant import version_info_str
 from .constant import alignment_location
 
 
 class Qrcode:
+    level = None
     qrcode = None
     version = None
     encode_data = None
     data_matrix = None
+    mask = None
     length = 0
     size = ()
 
@@ -19,9 +24,11 @@ class Qrcode:
         self.qrcode.save(path)
         return
 
-    def __init__(self, message):
+    def __init__(self, message, level='L'):
+        self.level = level_index[level]
+
         def decide_version(message):
-            self.version = 1
+            self.version = 7
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
 
@@ -54,11 +61,32 @@ class Qrcode:
                 self.qrcode.putpixel((8, 13 + 4 * (self.version - 1)), 0)
 
             def build_alignment_sign():
+                point_matrix = []
                 if alignment_location[self.version]:
-                    return
+                    for i in alignment_location[self.version]:
+                        for j in alignment_location[self.version]:
+                            point_matrix.append((j, i))
+                matrix_len = len(point_matrix)
+                for index in range(len(point_matrix)):
+                    if index == 0 or index == sqrt(matrix_len) - 1 or index == matrix_len - (sqrt(matrix_len) - 1) - 1:
+                        continue
+                    else:
+                        self.qrcode.putpixel(point_matrix[index], 0)
+                        for offset in range(-2, 3):
+                            self.qrcode.putpixel((point_matrix[index][0] + offset, point_matrix[index][1] - 2), 0)
+                            self.qrcode.putpixel((point_matrix[index][0] + offset, point_matrix[index][1] + 2), 0)
+                            self.qrcode.putpixel((point_matrix[index][0] - 2, point_matrix[index][1] + offset), 0)
+                            self.qrcode.putpixel((point_matrix[index][0] + 2, point_matrix[index][1] + offset), 0)
+
+            def level_and_mask_draw():
+                return
 
             def version_info_draw():
-                return
+                if self.version > 6:
+                    _version_info = version_info_str[self.version][::-1]
+                    for num_i in range(len(_version_info)):
+                        self.qrcode.putpixel((num_i // 3, num_i % 3 + self.length - 11), 1 - int(_version_info[num_i]))
+                        self.qrcode.putpixel((num_i % 3 + self.length - 11, num_i // 3), 1 - int(_version_info[num_i]))
 
             def data_draw():
                 return
@@ -67,6 +95,7 @@ class Qrcode:
             build_locate_sign()
             build_time_sign()
             build_alignment_sign()
+            level_and_mask_draw()
             version_info_draw()
             data_draw()
 
@@ -78,9 +107,9 @@ class Qrcode:
                 return _data
 
             def penalty(_data):
-                return _data
+                return None, None
 
-            self.data_matrix = penalty(mask(rs(self.encode_data)))
+            (self.data_matrix, self.mask) = penalty(mask(rs(self.encode_data)))
 
         decide_version(message)
         encode()
