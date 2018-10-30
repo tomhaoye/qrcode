@@ -1,16 +1,15 @@
 #!/usr/bin/python
 from PIL import Image
 from math import sqrt
-from .constant import level_index
-from .constant import format_info_str
-from .constant import version_info_str
-from .constant import alignment_location
+from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
+    alphanum_list, character_amount, ecc_num_version_level_map
 
 
 class Qrcode:
+    mode = None
     level = None
     qrcode = None
-    version = None
+    version = 1
     encode_data = None
     data_matrix = None
     mask_id = None
@@ -25,13 +24,26 @@ class Qrcode:
         self.qrcode.save(path)
         return
 
-    def __init__(self, message, level='L'):
-        self.level = level_index[level]
+    def __init__(self, message, level_index='L'):
+        self.level = level_map[level_index]
 
-        def decide_version(message):
-            self.version = 7
+        def decide_version(_message, _level_index):
+            if all(i in num_list for i in _message):
+                mode = 'numeric'
+            elif all(i in alphanum_list for i in _message):
+                mode = 'alphanumeric'
+            elif all(ord(i) in range(256) for i in _message):
+                mode = 'byte'
+            else:
+                mode = 'kanji'
+            for each_version in range(40):
+                if character_amount[_level_index][each_version][mode_map[mode]] > len(_message):
+                    self.version = each_version + 1 if each_version + 1 > self.version else self.version
+                    break
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
+            self.mode = mode
+            print(self.version)
 
         def draw():
             def build_locate_sign():
@@ -103,22 +115,49 @@ class Qrcode:
             build_locate_sign()
             build_time_sign()
             build_alignment_sign()
+            data_draw()
             level_and_mask_draw()
             version_info_draw()
-            data_draw()
 
         def encode():
-            def rs(_data):
-                return _data
+            def numeric_encode(_message):
+                code = []
+                divided_arr = [_message[i:i + 3] for i in range(0, len(_message), 3)]
+                for _equal_or_less_than_three_digits in divided_arr:
+                    respectively_len = 10 - 3 * (3 - len(_equal_or_less_than_three_digits))
+                    code.append(bin(int(_equal_or_less_than_three_digits))[2:].zfill(respectively_len))
+                return code
 
-            def mask(_data):
-                return _data
+            def alphanumeric_encode(_message):
+                code = []
+                trans_list = [alphanum_list.index(s) for s in _message]
+                for i in range(1, len(trans_list), 2):
+                    code.append(bin(trans_list[i - 1] * 45 + trans_list[i])[2:].zfill(11))
+                code if i == len(trans_list) - 1 else code.append(bin(trans_list[-1])[2:].zfill(6))
+                return code
 
-            def penalty(_data):
+            def byte_encode(_message):
+                code = []
+                for b in _message:
+                    code.append(bin(ord(b.encode('iso-8859-1')))[2:].zfill(8))
+                return code
+
+            def kanji_encode(_message):
+                return []
+
+            def rs_encode():
+                ecc_num = ecc_num_version_level_map[self.version][self.level]
+
+            def mask():
+                return
+
+            def penalty():
                 return 0, 0
 
-            (self.data_matrix, self.mask_id) = penalty(mask(rs(self.encode_data)))
+            rs_encode()
+            mask()
+            (self.data_matrix, self.mask_id) = penalty()
 
-        decide_version(message)
+        decide_version(message, level_index)
         encode()
         draw()
