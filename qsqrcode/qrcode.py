@@ -2,7 +2,8 @@
 from PIL import Image
 from math import sqrt
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
-    alphanum_list, character_amount, ecc_num_version_level_map
+    alphanum_list, character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
+    each_version_required_bytes
 
 
 class Qrcode:
@@ -43,7 +44,6 @@ class Qrcode:
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
             self.mode = mode
-            print(self.version)
 
         def draw():
             def build_locate_sign():
@@ -119,33 +119,48 @@ class Qrcode:
             level_and_mask_draw()
             version_info_draw()
 
-        def encode():
-            def numeric_encode(_message):
-                code = []
-                divided_arr = [_message[i:i + 3] for i in range(0, len(_message), 3)]
-                for _equal_or_less_than_three_digits in divided_arr:
-                    respectively_len = 10 - 3 * (3 - len(_equal_or_less_than_three_digits))
-                    code.append(bin(int(_equal_or_less_than_three_digits))[2:].zfill(respectively_len))
-                return code
+        def encode(_message):
+            def get_data_codewords(__message):
+                def numeric_encode(___message):
+                    diff_encode_code = ''
+                    divided_arr = [___message[i:i + 3] for i in range(0, len(___message), 3)]
+                    for _equal_or_less_than_three_digits in divided_arr:
+                        respectively_len = 10 - 3 * (3 - len(_equal_or_less_than_three_digits))
+                        diff_encode_code += bin(int(_equal_or_less_than_three_digits))[2:].zfill(respectively_len)
+                    return diff_encode_code
 
-            def alphanumeric_encode(_message):
-                code = []
-                trans_list = [alphanum_list.index(s) for s in _message]
-                for i in range(1, len(trans_list), 2):
-                    code.append(bin(trans_list[i - 1] * 45 + trans_list[i])[2:].zfill(11))
-                code if i == len(trans_list) - 1 else code.append(bin(trans_list[-1])[2:].zfill(6))
-                return code
+                def alphanumeric_encode(___message):
+                    diff_encode_code = ''
+                    trans_list = [alphanum_list.index(s) for s in ___message]
+                    for i in range(1, len(trans_list), 2):
+                        diff_encode_code += bin(trans_list[i - 1] * 45 + trans_list[i])[2:].zfill(11)
+                    return diff_encode_code if i == len(trans_list) - 1 else diff_encode_code + bin(trans_list[-1])[
+                                                                                                2:].zfill(6)
 
-            def byte_encode(_message):
-                code = []
-                for b in _message:
-                    code.append(bin(ord(b.encode('iso-8859-1')))[2:].zfill(8))
-                return code
+                def byte_encode(___message):
+                    diff_encode_code = ''
+                    for b in ___message:
+                        diff_encode_code += bin(ord(b.encode('iso-8859-1')))[2:].zfill(8)
+                    return diff_encode_code
 
-            def kanji_encode(_message):
-                return []
+                def kanji_encode(___message):
+                    return []
 
-            def rs_encode():
+                incomplete_codewords = mode_indicator_map[self.mode] + (
+                    numeric_encode(__message) if self.mode == 'numeric' else (
+                        alphanumeric_encode(__message) if self.mode == 'alphanumeric' else (
+                            byte_encode(__message) if self.mode == 'byte' else kanji_encode(__message)))) + bin(
+                    len(__message))[2:].zfill(character_count_indicator_map[self.version][mode_map[self.mode]])
+                distance_to_8_multiple = 8 - (len(incomplete_codewords) % 8)
+                incomplete_codewords += '0' * distance_to_8_multiple
+
+                codewords = incomplete_codewords
+                bytes_need = 8 * each_version_required_bytes[self.version][self.level]
+                while len(codewords) < bytes_need:
+                    codewords += '1110110000010001' if bytes_need - len(codewords) >= 16 else '11101100'
+                return codewords
+
+            def rs_encode(_data_codewords):
                 ecc_num = ecc_num_version_level_map[self.version][self.level]
 
             def mask():
@@ -154,10 +169,11 @@ class Qrcode:
             def penalty():
                 return 0, 0
 
-            rs_encode()
+            data_codewords = get_data_codewords(_message)
+            rs_encode(data_codewords)
             mask()
             (self.data_matrix, self.mask_id) = penalty()
 
         decide_version(message, level_index)
-        encode()
+        encode(message)
         draw()
