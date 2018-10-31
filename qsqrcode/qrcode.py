@@ -3,15 +3,15 @@ from PIL import Image
 from math import sqrt
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     alphanum_list, character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
-    each_version_required_bytes
+    each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks
 
 
 class Qrcode:
+    py_version = 3
     mode = None
     level = None
     qrcode = None
     version = 1
-    encode_data = None
     data_matrix = None
     mask_id = None
     length = 0
@@ -33,12 +33,11 @@ class Qrcode:
                 mode = 'numeric'
             elif all(i in alphanum_list for i in _message):
                 mode = 'alphanumeric'
-            elif all(ord(i) in range(256) for i in _message):
-                mode = 'byte'
             else:
-                mode = 'kanji'
+                mode = 'byte'
             for each_version in range(40):
-                if character_amount[_level_index][each_version][mode_map[mode]] > len(_message):
+                if character_amount[_level_index][each_version][mode_map[mode]] > len(
+                        _message.encode() if self.py_version > 3 else _message):
                     self.version = each_version + 1 if each_version + 1 > self.version else self.version
                     break
             self.length = 21 + 4 * (self.version - 1)
@@ -139,12 +138,17 @@ class Qrcode:
 
                 def byte_encode(___message):
                     diff_encode_code = ''
-                    for b in ___message:
-                        diff_encode_code += bin(ord(b.encode('iso-8859-1')))[2:].zfill(8)
+                    if self.py_version > 3:
+                        ___message = ___message.encode()
+                        for ord_b in ___message:
+                            diff_encode_code += bin(ord_b)[2:].zfill(8)
+                    else:
+                        for b in ___message:
+                            diff_encode_code += bin(ord(b))[2:].zfill(8)
                     return diff_encode_code
 
                 def kanji_encode(___message):
-                    return []
+                    pass
 
                 incomplete_codewords = mode_indicator_map[self.mode] + (
                     numeric_encode(__message) if self.mode == 'numeric' else (
@@ -158,21 +162,31 @@ class Qrcode:
                 bytes_need = 8 * each_version_required_bytes[self.version][self.level]
                 while len(codewords) < bytes_need:
                     codewords += '1110110000010001' if bytes_need - len(codewords) >= 16 else '11101100'
-                return codewords
+                _data_codewords = [int(codewords[i:i + 8], 2) for i in range(len(codewords)) if not i % 8]
+                return _data_codewords
 
             def rs_encode(_data_codewords):
+                _encode_data = ''
+                data_block, i = [], 0
+                block_codecount = num_of_error_correction_blocks_2_error_correction_per_blocks[self.version][self.level]
+                for group1 in range(block_codecount[0]):
+                    data_block.append(_data_codewords[i:i + block_codecount[1]])
+                    i += block_codecount[1]
+                for group2 in range(block_codecount[2]):
+                    data_block.append(_data_codewords[i:i + block_codecount[3]])
+                    i += block_codecount[3]
                 ecc_num = ecc_num_version_level_map[self.version][self.level]
+                return _encode_data
 
-            def mask():
-                return
+            def mask(encode_data):
+                def penalty():
+                    return
 
-            def penalty():
                 return 0, 0
 
             data_codewords = get_data_codewords(_message)
-            rs_encode(data_codewords)
-            mask()
-            (self.data_matrix, self.mask_id) = penalty()
+            encode_data = rs_encode(data_codewords)
+            (self.data_matrix, self.mask_id) = mask(encode_data)
 
         decide_version(message, level_index)
         encode(message)
