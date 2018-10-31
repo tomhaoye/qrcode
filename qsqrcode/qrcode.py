@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from PIL import Image
 from math import sqrt
+from reedsolo import rs_generator_poly, gf_mul
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     alphanum_list, character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
     each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks
@@ -166,8 +167,7 @@ class Qrcode:
                 return _data_codewords
 
             def rs_encode(_data_codewords):
-                _encode_data = ''
-                data_block, i = [], 0
+                _encode_data, data_block, i = '', [], 0
                 block_codecount = num_of_error_correction_blocks_2_error_correction_per_blocks[self.version][self.level]
                 for group1 in range(block_codecount[0]):
                     data_block.append(_data_codewords[i:i + block_codecount[1]])
@@ -175,7 +175,20 @@ class Qrcode:
                 for group2 in range(block_codecount[2]):
                     data_block.append(_data_codewords[i:i + block_codecount[3]])
                     i += block_codecount[3]
-                ecc_num = ecc_num_version_level_map[self.version][self.level]
+                nsym = ecc_num_version_level_map[self.version][self.level]
+                gen = rs_generator_poly(nsym)
+                ecc_num = len(gen) - 1
+                _encode_data = []
+                for block in data_block:
+                    _encode_block = block + [0] * ecc_num
+                    for i in range(len(block)):
+                        coef = _encode_block[i]
+                        if coef != 0:
+                            for j in range(ecc_num + 1):
+                                _encode_block[i + j] ^= gf_mul(gen[j], coef)
+                    for i in range(len(block)):
+                        _encode_block[i] = block[i]
+                    _encode_data.append(_encode_block)
                 return _encode_data
 
             def mask(encode_data):
@@ -186,6 +199,7 @@ class Qrcode:
 
             data_codewords = get_data_codewords(_message)
             encode_data = rs_encode(data_codewords)
+            print(encode_data)
             (self.data_matrix, self.mask_id) = mask(encode_data)
 
         decide_version(message, level_index)
