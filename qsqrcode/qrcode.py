@@ -47,31 +47,34 @@ class Qrcode:
 
         def build_matrix(encode_data):
             def build_locate_sign():
-                for i in range(7):
-                    self.data_matrix[0][i] = 0
-                    self.data_matrix[6][i] = 0
-                    self.data_matrix[0][i + 14 + 4 * (self.version - 1)] = 0
-                    self.data_matrix[6][i + 14 + 4 * (self.version - 1)] = 0
-                    self.data_matrix[14 + 4 * (self.version - 1)][i] = 0
-                    self.data_matrix[20 + 4 * (self.version - 1)][i] = 0
-                    self.data_matrix[i][0] = 0
-                    self.data_matrix[i][6] = 0
-                    self.data_matrix[i][14 + 4 * (self.version - 1)] = 0
-                    self.data_matrix[i][20 + 4 * (self.version - 1)] = 0
-                    self.data_matrix[i + 14 + 4 * (self.version - 1)][0] = 0
-                    self.data_matrix[i + 14 + 4 * (self.version - 1)][6] = 0
-
-                for j in range(2, 5):
-                    for k in range(2, 5):
-                        self.data_matrix[j][k] = 0
-                        self.data_matrix[j + 14 + 4 * (self.version - 1)][k] = 0
-                        self.data_matrix[j][k + 14 + 4 * (self.version - 1)] = 0
+                for i in range(8):
+                    for j in range(8):
+                        if i in (0, 6):
+                            self.data_matrix[i][j] = self.data_matrix[-i - 1][j] = self.data_matrix[i][
+                                -j - 1] = 0 if j == 7 else 1
+                        elif i in (1, 5):
+                            self.data_matrix[i][j] = self.data_matrix[-i - 1][j] = self.data_matrix[i][
+                                -j - 1] = 1 if j in (0, 6) else 0
+                        elif i == 7:
+                            self.data_matrix[i][j] = self.data_matrix[-i - 1][j] = self.data_matrix[i][-j - 1] = 0
+                        else:
+                            self.data_matrix[i][j] = self.data_matrix[-i - 1][j] = self.data_matrix[i][
+                                -j - 1] = 0 if j in (1, 5, 7) else 1
 
             def build_time_sign():
-                for i in range(3 + 2 * (self.version - 1)):
-                    self.data_matrix[8 + 2 * i][6] = 0
-                    self.data_matrix[6][8 + 2 * i] = 0
-                self.data_matrix[8][13 + 4 * (self.version - 1)] = 0
+                for i in range(self.length):
+                    self.data_matrix[i][6] = self.data_matrix[6][i] = 1 if i % 2 == 0 else 0
+
+            def build_dark_sign():
+                for j in range(8):
+                    self.data_matrix[8][j] = self.data_matrix[8][-j - 1] = self.data_matrix[j][8] = \
+                        self.data_matrix[-j - 1][8] = 0
+                self.data_matrix[8][8] = 0
+                self.data_matrix[8][6] = self.data_matrix[6][8] = self.data_matrix[-8][8] = 1
+                if self.version > 6:
+                    for i in range(6):
+                        for j in (-9, -10, -11):
+                            self.data_matrix[i][j] = self.data_matrix[j][i] = 0
 
             def build_alignment_sign():
                 point_matrix = []
@@ -84,40 +87,38 @@ class Qrcode:
                     if index == 0 or index == sqrt(matrix_len) - 1 or index == matrix_len - (sqrt(matrix_len) - 1) - 1:
                         continue
                     else:
-                        self.data_matrix[point_matrix[index][0]][point_matrix[index][1]] = 0
-                        for offset in range(-2, 3):
-                            self.data_matrix[point_matrix[index][0] + offset][point_matrix[index][1] - 2] = 0
-                            self.data_matrix[point_matrix[index][0] + offset][point_matrix[index][1] + 2] = 0
-                            self.data_matrix[point_matrix[index][0] - 2][point_matrix[index][1] + offset] = 0
-                            self.data_matrix[point_matrix[index][0] + 2][point_matrix[index][1] + offset] = 0
+                        for x_offset in range(-2, 3):
+                            for y_offset in range(-2, 3):
+                                self.data_matrix[point_matrix[index][0] + x_offset][point_matrix[index][1] + y_offset] \
+                                    = 1 if x_offset % 2 == 0 and y_offset % 2 == 0 or abs(x_offset) + abs(
+                                    y_offset) == 3 else 0
 
             def level_and_mask_build():
                 for format_i in range(len(format_info_str[self.level][self.mask_id])):
                     self.data_matrix[format_i if format_i < 6 else (
-                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))][8] = 1 - int(
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))][8] = int(
                         format_info_str[self.level][self.mask_id][format_i])
                     self.data_matrix[8][format_i if format_i < 6 else (
-                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))] = 1 - int(
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))] = int(
                         format_info_str[self.level][self.mask_id][14 - format_i])
-                self.data_matrix[self.length - 8][8] = 1 - int(format_info_str[self.level][self.mask_id][7])
+                self.data_matrix[self.length - 8][8] = int(format_info_str[self.level][self.mask_id][7])
 
             def version_info_build():
                 if self.version > 6:
                     _version_info = version_info_str[self.version][::-1]
                     for num_i in range(len(_version_info)):
-                        self.data_matrix[num_i // 3][num_i % 3 + self.length - 11] = 1 - int(_version_info[num_i])
-                        self.data_matrix[num_i % 3 + self.length - 11][num_i // 3] = 1 - int(_version_info[num_i])
+                        self.data_matrix[num_i // 3][num_i % 3 + self.length - 11] = int(_version_info[num_i])
+                        self.data_matrix[num_i % 3 + self.length - 11][num_i // 3] = int(_version_info[num_i])
 
             def data_build(_encode_data):
                 up = True
                 bit = (int(i) for i in _encode_data)
-                for a in range(len(self.data_matrix) - 1, 0, -2):
-                    a = a - 1 if a <= 6 else a
-                    i_range = range(len(self.data_matrix) - 1, -1, -1) if up else range(len(self.data_matrix))
-                    for i in i_range:
-                        for j in (a, a - 1):
-                            if self.data_matrix[i][j] is None:
-                                self.data_matrix[i][j] = next(bit)
+                for _block_end_x in range(self.length - 1, 0, -2):
+                    _block_end_x = _block_end_x if _block_end_x > 6 else _block_end_x - 1
+                    for y in range(self.length - 1, -1, -1) if up else range(self.length):
+                        for x in (_block_end_x, _block_end_x - 1):
+                            if self.data_matrix[x][y] is None:
+                                self.data_matrix[x][y] = next(bit, 0)
                     up = not up
 
             def mask():
@@ -127,15 +128,19 @@ class Qrcode:
                 self.mask_id = 0
 
             self.data_matrix = [[None] * self.length for i in range(self.length)]
-            build_locate_sign()
             build_time_sign()
+            build_dark_sign()
+            build_locate_sign()
             build_alignment_sign()
             version_info_build()
-            data_build(encode_data)
             # level_and_mask_build()
+            data_build(encode_data)
 
         def draw():
             self.qrcode = Image.new('1', self.size, 1)
+            for x in range(self.length):
+                for y in range(self.length):
+                    self.qrcode.putpixel((x, y), 0 if self.data_matrix[x][y] else 1)
 
         def encode(_message):
             def get_data_codewords(__message):
@@ -216,5 +221,4 @@ class Qrcode:
 
         decide_version(message, level_index)
         build_matrix(encode(message))
-        print(self.data_matrix)
-        # draw()
+        draw()
