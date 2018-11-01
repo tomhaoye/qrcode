@@ -4,7 +4,7 @@ from math import sqrt
 from reedsolo import rs_generator_poly, gf_mul
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     alphanum_list, character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
-    each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks
+    each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks, remainder_bits
 
 
 class Qrcode:
@@ -45,33 +45,33 @@ class Qrcode:
             self.size = (self.length, self.length)
             self.mode = mode
 
-        def draw():
+        def build_matrix(encode_data):
             def build_locate_sign():
                 for i in range(7):
-                    self.qrcode.putpixel((0, i), 0)
-                    self.qrcode.putpixel((6, i), 0)
-                    self.qrcode.putpixel((0, i + 14 + 4 * (self.version - 1)), 0)
-                    self.qrcode.putpixel((6, i + 14 + 4 * (self.version - 1)), 0)
-                    self.qrcode.putpixel((14 + 4 * (self.version - 1), i), 0)
-                    self.qrcode.putpixel((20 + 4 * (self.version - 1), i), 0)
-                    self.qrcode.putpixel((i, 0), 0)
-                    self.qrcode.putpixel((i, 6), 0)
-                    self.qrcode.putpixel((i, 14 + 4 * (self.version - 1)), 0)
-                    self.qrcode.putpixel((i, 20 + 4 * (self.version - 1)), 0)
-                    self.qrcode.putpixel((i + 14 + 4 * (self.version - 1), 0), 0)
-                    self.qrcode.putpixel((i + 14 + 4 * (self.version - 1), 6), 0)
+                    self.data_matrix[0][i] = 0
+                    self.data_matrix[6][i] = 0
+                    self.data_matrix[0][i + 14 + 4 * (self.version - 1)] = 0
+                    self.data_matrix[6][i + 14 + 4 * (self.version - 1)] = 0
+                    self.data_matrix[14 + 4 * (self.version - 1)][i] = 0
+                    self.data_matrix[20 + 4 * (self.version - 1)][i] = 0
+                    self.data_matrix[i][0] = 0
+                    self.data_matrix[i][6] = 0
+                    self.data_matrix[i][14 + 4 * (self.version - 1)] = 0
+                    self.data_matrix[i][20 + 4 * (self.version - 1)] = 0
+                    self.data_matrix[i + 14 + 4 * (self.version - 1)][0] = 0
+                    self.data_matrix[i + 14 + 4 * (self.version - 1)][6] = 0
 
                 for j in range(2, 5):
                     for k in range(2, 5):
-                        self.qrcode.putpixel((j, k), 0)
-                        self.qrcode.putpixel((j + 14 + 4 * (self.version - 1), k), 0)
-                        self.qrcode.putpixel((j, k + 14 + 4 * (self.version - 1)), 0)
+                        self.data_matrix[j][k] = 0
+                        self.data_matrix[j + 14 + 4 * (self.version - 1)][k] = 0
+                        self.data_matrix[j][k + 14 + 4 * (self.version - 1)] = 0
 
             def build_time_sign():
                 for i in range(3 + 2 * (self.version - 1)):
-                    self.qrcode.putpixel((8 + 2 * i, 6), 0)
-                    self.qrcode.putpixel((6, 8 + 2 * i), 0)
-                self.qrcode.putpixel((8, 13 + 4 * (self.version - 1)), 0)
+                    self.data_matrix[8 + 2 * i][6] = 0
+                    self.data_matrix[6][8 + 2 * i] = 0
+                self.data_matrix[8][13 + 4 * (self.version - 1)] = 0
 
             def build_alignment_sign():
                 point_matrix = []
@@ -84,40 +84,58 @@ class Qrcode:
                     if index == 0 or index == sqrt(matrix_len) - 1 or index == matrix_len - (sqrt(matrix_len) - 1) - 1:
                         continue
                     else:
-                        self.qrcode.putpixel(point_matrix[index], 0)
+                        self.data_matrix[point_matrix[index][0]][point_matrix[index][1]] = 0
                         for offset in range(-2, 3):
-                            self.qrcode.putpixel((point_matrix[index][0] + offset, point_matrix[index][1] - 2), 0)
-                            self.qrcode.putpixel((point_matrix[index][0] + offset, point_matrix[index][1] + 2), 0)
-                            self.qrcode.putpixel((point_matrix[index][0] - 2, point_matrix[index][1] + offset), 0)
-                            self.qrcode.putpixel((point_matrix[index][0] + 2, point_matrix[index][1] + offset), 0)
+                            self.data_matrix[point_matrix[index][0] + offset][point_matrix[index][1] - 2] = 0
+                            self.data_matrix[point_matrix[index][0] + offset][point_matrix[index][1] + 2] = 0
+                            self.data_matrix[point_matrix[index][0] - 2][point_matrix[index][1] + offset] = 0
+                            self.data_matrix[point_matrix[index][0] + 2][point_matrix[index][1] + offset] = 0
 
-            def level_and_mask_draw():
+            def level_and_mask_build():
                 for format_i in range(len(format_info_str[self.level][self.mask_id])):
-                    self.qrcode.putpixel((format_i if format_i < 6 else (
-                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8)), 8), 1 - int(
-                        format_info_str[self.level][self.mask_id][format_i]))
-                    self.qrcode.putpixel((8, format_i if format_i < 6 else (
-                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))),
-                                         1 - int(format_info_str[self.level][self.mask_id][14 - format_i]))
-                self.qrcode.putpixel((self.length - 8, 8), 1 - int(format_info_str[self.level][self.mask_id][7]))
+                    self.data_matrix[format_i if format_i < 6 else (
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))][8] = 1 - int(
+                        format_info_str[self.level][self.mask_id][format_i])
+                    self.data_matrix[8][format_i if format_i < 6 else (
+                        format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))] = 1 - int(
+                        format_info_str[self.level][self.mask_id][14 - format_i])
+                self.data_matrix[self.length - 8][8] = 1 - int(format_info_str[self.level][self.mask_id][7])
 
-            def version_info_draw():
+            def version_info_build():
                 if self.version > 6:
                     _version_info = version_info_str[self.version][::-1]
                     for num_i in range(len(_version_info)):
-                        self.qrcode.putpixel((num_i // 3, num_i % 3 + self.length - 11), 1 - int(_version_info[num_i]))
-                        self.qrcode.putpixel((num_i % 3 + self.length - 11, num_i // 3), 1 - int(_version_info[num_i]))
+                        self.data_matrix[num_i // 3][num_i % 3 + self.length - 11] = 1 - int(_version_info[num_i])
+                        self.data_matrix[num_i % 3 + self.length - 11][num_i // 3] = 1 - int(_version_info[num_i])
 
-            def data_draw():
+            def data_build(_encode_data):
+                up = True
+                bit = (int(i) for i in _encode_data)
+                for a in range(len(self.data_matrix) - 1, 0, -2):
+                    a = a - 1 if a <= 6 else a
+                    i_range = range(len(self.data_matrix) - 1, -1, -1) if up else range(len(self.data_matrix))
+                    for i in i_range:
+                        for j in (a, a - 1):
+                            if self.data_matrix[i][j] is None:
+                                self.data_matrix[i][j] = next(bit)
+                    up = not up
+
+            def mask():
                 return
 
-            self.qrcode = Image.new('1', self.size, 1)
+            def penalty():
+                self.mask_id = 0
+
+            self.data_matrix = [[None] * self.length for i in range(self.length)]
             build_locate_sign()
             build_time_sign()
             build_alignment_sign()
-            data_draw()
-            level_and_mask_draw()
-            version_info_draw()
+            version_info_build()
+            data_build(encode_data)
+            # level_and_mask_build()
+
+        def draw():
+            self.qrcode = Image.new('1', self.size, 1)
 
         def encode(_message):
             def get_data_codewords(__message):
@@ -189,19 +207,14 @@ class Qrcode:
                     for i in range(len(block)):
                         _encode_block[i] = block[i]
                     _encode_data.append(_encode_block)
+                _encode_data = ''.join(str(bin(dec)[2:]) for block in zip(*_encode_data) for dec in block)
+                _encode_data += '0' * remainder_bits[self.version]
                 return _encode_data
 
-            def mask(encode_data):
-                def penalty():
-                    return
-
-                return 0, 0
-
             data_codewords = get_data_codewords(_message)
-            encode_data = rs_encode(data_codewords)
-            print(encode_data)
-            (self.data_matrix, self.mask_id) = mask(encode_data)
+            return rs_encode(data_codewords)
 
         decide_version(message, level_index)
-        encode(message)
-        draw()
+        build_matrix(encode(message))
+        print(self.data_matrix)
+        # draw()
