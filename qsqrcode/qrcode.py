@@ -174,11 +174,12 @@ class Qrcode:
                 def kanji_encode(___message):
                     pass
 
-                incomplete_codewords = mode_indicator_map[self.mode] + (
-                    numeric_encode(__message) if self.mode == 'numeric' else (
-                        alphanumeric_encode(__message) if self.mode == 'alphanumeric' else (
-                            byte_encode(__message) if self.mode == 'byte' else kanji_encode(__message)))) + bin(
-                    len(__message))[2:].zfill(character_count_indicator_map[self.version][mode_map[self.mode]])
+                incomplete_codewords = mode_indicator_map[self.mode] + bin(len(__message))[2:].zfill(
+                    character_count_indicator_map[self.version][mode_map[self.mode]]) + (
+                                           numeric_encode(__message) if self.mode == 'numeric' else (
+                                               alphanumeric_encode(__message) if self.mode == 'alphanumeric' else (
+                                                   byte_encode(__message) if self.mode == 'byte' else kanji_encode(
+                                                       __message))))
                 distance_to_8_multiple = 8 - (len(incomplete_codewords) % 8)
                 incomplete_codewords += '0' * distance_to_8_multiple
 
@@ -212,7 +213,7 @@ class Qrcode:
                     for i in range(len(block)):
                         _encode_block[i] = block[i]
                     _encode_data.append(_encode_block)
-                _encode_data = ''.join(str(bin(dec)[2:]) for block in zip(*_encode_data) for dec in block)
+                _encode_data = ''.join(bin(dec)[2:].zfill(8) for block in zip(*_encode_data) for dec in block)
                 _encode_data += '0' * remainder_bits[self.version]
                 return _encode_data
 

@@ -1,4 +1,4 @@
 from qsqrcode.qrcode import Qrcode
 
-qr = Qrcode('hello', 'M')
+qr = Qrcode('test', 'L')
 qr.generate('test.png')
