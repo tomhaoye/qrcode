@@ -122,72 +122,76 @@ class Qrcode:
                     up = not up
 
             def mask():
-                return
+                def penalty(__matrix):
+                    def cal_n3(___matrix):
+                        _count = 0
+                        check_word = ('00001011101', '10111010000')
+                        for row in ___matrix:
+                            row_str = ''.join(row)
+                            begin = 0
+                            while begin < len(row_str) and check_word[0] in row_str:
+                                begin = row_str.index(check_word[0]) + len(check_word[0])
+                                _count += 1
+                            begin = 0
+                            while begin < len(row_str) and check_word[1] in row_str:
+                                begin = row_str.index(check_word[1]) + len(check_word[1])
+                                _count += 1
+                        return _count
 
-            def penalty():
-                def cal_n3(_matrix):
-                    _count = 0
-                    check_word = ('00001011101', '10111010000')
-                    for row in _matrix:
-                        row_str = ''.join(row)
-                        begin = 0
-                        while begin < len(row_str) and check_word[0] in row_str:
-                            begin = row_str.index(check_word[0]) + len(check_word[0])
-                            _count += 1
-                        begin = 0
-                        while begin < len(row_str) and check_word[1] in row_str:
-                            begin = row_str.index(check_word[1]) + len(check_word[1])
-                            _count += 1
-                    return _count
+                    def get_sum(___matrix):
+                        num = 0
+                        for v in ___matrix:
+                            if v is list:
+                                num += get_sum(v)
+                        return num + sum(map(sum, ___matrix))
 
-                def get_sum(_matrix):
-                    num = 0
-                    for v in _matrix:
-                        if v is list:
-                            num += get_sum(v)
-                    return num + sum(map(sum, _matrix))
-
-                n1 = 0
-                n2 = 0
-                n3 = 0
-                n4 = 0
-                # N1寻找连续同色块which >= 5
-                for reverse in range(0, 2):
-                    for j in range(reverse, self.length):
-                        count = 1
-                        adj = False
-                        for i in range(1 - reverse, self.length):
-                            if self.data_matrix[j][i] == self.data_matrix[j][i - 1]:
-                                count += 1
-                            else:
-                                count = 1
-                                adj = False
-                            if count >= 5:
-                                if not adj:
-                                    adj = True
-                                    n1 += 3
+                    n1 = 0
+                    n2 = 0
+                    n3 = 0
+                    n4 = 0
+                    # N1寻找连续同色块which >= 5
+                    for reverse in range(0, 2):
+                        for j in range(reverse, self.length):
+                            count = 1
+                            adj = False
+                            for i in range(1 - reverse, self.length):
+                                if __matrix[j][i] == __matrix[j][i - 1]:
+                                    count += 1
                                 else:
-                                    n1 += 1
-                # N2寻找m * n的同色块
-                count = 0
-                for j in range(self.length):
-                    for i in range(self.length):
-                        if self.data_matrix[j][i] == self.data_matrix[j - 1][i] and self.data_matrix[j][i] == \
-                                self.data_matrix[j][i - 1] and self.data_matrix[j][i] == self.data_matrix[j - 1][i - 1]:
-                            count += 1
-                n2 += 3 * count
-                # N3寻找连续四空色块0000连接1011101色块
-                # 一个方向寻找 + 另一个方向(矩阵转置)
-                transposition_matrix = list(zip(*self.data_matrix))
-                n3 += 40 * cal_n3(self.data_matrix) + cal_n3(transposition_matrix)
-                # N4计算黑色块占比
-                dark = get_sum(self.data_matrix)
-                percent = dark // pow(self.length, 2) * 100
-                pre = percent - percent % 5
-                nex = percent + 5 - percent % 5
-                n4 = min(abs(pre - 50) / 5, abs(nex - 50) / 5) * 10
+                                    count = 1
+                                    adj = False
+                                if count >= 5:
+                                    if not adj:
+                                        adj = True
+                                        n1 += 3
+                                    else:
+                                        n1 += 1
+                    # N2寻找m * n的同色块
+                    count = 0
+                    for j in range(self.length):
+                        for i in range(self.length):
+                            if __matrix[j][i] == __matrix[j - 1][i] and __matrix[j][i] == \
+                                    __matrix[j][i - 1] and __matrix[j][i] == __matrix[j - 1][i - 1]:
+                                count += 1
+                    n2 += 3 * count
+                    # N3寻找连续四空色块0000连接1011101色块
+                    # 一个方向寻找 + 另一个方向(矩阵转置)
+                    transposition_matrix = list(zip(*__matrix))
+                    n3 += 40 * cal_n3(__matrix) + cal_n3(transposition_matrix)
+                    # N4计算黑色块占比
+                    dark = get_sum(__matrix)
+                    percent = dark // pow(self.length, 2) * 100
+                    pre = percent - percent % 5
+                    nex = percent + 5 - percent % 5
+                    n4 = min(abs(pre - 50) / 5, abs(nex - 50) / 5) * 10
+                    return n1 + n2 + n3 + n4
 
-                self.mask_id = 0
+                penalty_result = []
+                for i in range(8):
+                    # todo 掩码计算
+                    _matrix = []
+                    penalty_result.append(penalty(_matrix))
+                return penalty_result.index(min(penalty_result))
 
             self.data_matrix = [[None] * self.length for i in range(self.length)]
             build_time_sign()
@@ -195,7 +199,8 @@ class Qrcode:
             build_locate_sign()
             build_alignment_sign()
             version_info_build()
-            # level_and_mask_build()
+            self.mask_id = mask()
+            level_and_mask_build()
             data_build(encode_data)
 
         def draw():
