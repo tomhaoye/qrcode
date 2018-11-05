@@ -28,6 +28,7 @@ class Qrcode:
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
+        message = message.encode() if self.version >= 3 else message
 
         def decide_version(_message, _level_index):
             if all(i in num_list for i in _message):
@@ -37,8 +38,7 @@ class Qrcode:
             else:
                 mode = 'byte'
             for each_version in range(40):
-                if character_amount[_level_index][each_version][mode_map[mode]] > len(
-                        _message.encode() if self.py_version > 3 else _message):
+                if character_amount[_level_index][each_version][mode_map[mode]] > len(_message):
                     self.version = each_version + 1 if each_version + 1 > self.version else self.version
                     break
             self.length = 21 + 4 * (self.version - 1)
