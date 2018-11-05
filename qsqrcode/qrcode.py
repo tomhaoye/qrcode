@@ -103,7 +103,7 @@ class Qrcode:
                         format_info_str[self.level][_mask_id][14 - format_i])
                 self.data_matrix[self.length - 8][8] = int(format_info_str[self.level][_mask_id][7])
 
-            def version_info_build():
+            def build_version_info():
                 if self.version > 6:
                     _version_info = version_info_str[self.version][::-1]
                     for num_i in range(len(_version_info)):
@@ -221,19 +221,18 @@ class Qrcode:
                 self.data_matrix = _matrix_with_mask[_best_mask_id]
                 return _best_mask_id
 
+            def build_fix_sign():
+                build_time_sign()
+                build_dark_sign()
+                build_locate_sign()
+                build_alignment_sign()
+                build_version_info()
+
             self.data_matrix = [[None] * self.length for i in range(self.length)]
-            build_time_sign()
-            build_dark_sign()
-            build_locate_sign()
-            build_alignment_sign()
-            version_info_build()
+            build_fix_sign()
             data_build(encode_data)
             self.mask_id = mask()
-            build_time_sign()
-            build_dark_sign()
-            build_locate_sign()
-            build_alignment_sign()
-            version_info_build()
+            build_fix_sign()
             level_and_mask_build(self.mask_id)
 
         def draw():
