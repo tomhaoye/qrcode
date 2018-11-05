@@ -207,6 +207,7 @@ class Qrcode:
                     return n1 + n2 + n3 + n4
 
                 penalty_result = []
+                _matrix_with_mask = []
                 for mask_id in range(8):
                     level_and_mask_build(mask_id)
                     _matrix = [[None] * self.length for _i in range(self.length)]
@@ -215,7 +216,10 @@ class Qrcode:
                             if self.data_matrix[x][y] is not None:
                                 _matrix[x][y] = self.data_matrix[x][y] ^ mask_template(x, y, mask_id)
                     penalty_result.append(penalty(_matrix))
-                return penalty_result.index(min(penalty_result))
+                    _matrix_with_mask.append(_matrix)
+                _best_mask_id = penalty_result.index(min(penalty_result))
+                self.data_matrix = _matrix_with_mask[_best_mask_id]
+                return _best_mask_id
 
             self.data_matrix = [[None] * self.length for i in range(self.length)]
             build_time_sign()
@@ -225,6 +229,11 @@ class Qrcode:
             version_info_build()
             data_build(encode_data)
             self.mask_id = mask()
+            build_time_sign()
+            build_dark_sign()
+            build_locate_sign()
+            build_alignment_sign()
+            version_info_build()
             level_and_mask_build(self.mask_id)
 
         def draw():
