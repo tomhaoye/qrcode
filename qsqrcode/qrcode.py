@@ -150,11 +150,11 @@ class Qrcode:
                             row_str = ''.join(str(s) for s in row)
                             begin = 0
                             while begin < len(row_str) and check_word[0] in row_str[begin:]:
-                                begin = row_str.index(check_word[0]) + len(check_word[0])
+                                begin += row_str[begin:].index(check_word[0]) + len(check_word[0])
                                 _count += 1
                             begin = 0
                             while begin < len(row_str) and check_word[1] in row_str[begin:]:
-                                begin = row_str.index(check_word[1]) + len(check_word[1])
+                                begin += row_str[begin:].index(check_word[1]) + len(check_word[1])
                                 _count += 1
                         return _count
 
