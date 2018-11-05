@@ -70,7 +70,7 @@ class Qrcode:
                     self.data_matrix[8][j] = self.data_matrix[8][-j - 1] = self.data_matrix[j][8] = \
                         self.data_matrix[-j - 1][8] = 0
                 self.data_matrix[8][8] = 0
-                self.data_matrix[8][6] = self.data_matrix[6][8] = self.data_matrix[-8][8] = 1
+                self.data_matrix[8][6] = self.data_matrix[6][8] = self.data_matrix[8][-8] = 1
                 if self.version > 6:
                     for i in range(6):
                         for j in (-9, -10, -11):
