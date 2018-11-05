@@ -1,4 +1,4 @@
 from qsqrcode.qrcode import Qrcode
 
-qr = Qrcode('http://blog.aikeji.online', 'Q')
+qr = Qrcode('blog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.onlineblog.aikeji.online', 'L')
 qr.generate('test.png')

@@ -44,6 +44,7 @@ class Qrcode:
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
             self.mode = mode
+            print(self.version)
 
         def build_matrix(encode_data):
             def build_locate_sign():
@@ -298,6 +299,9 @@ class Qrcode:
                 for group2 in range(block_codecount[2]):
                     data_block.append(_data_codewords[i:i + block_codecount[3]])
                     i += block_codecount[3]
+
+                print(data_block)
+
                 nsym = ecc_num_version_level_map[self.version][self.level]
                 gen = rs_generator_poly(nsym)
                 ecc_num = len(gen) - 1
@@ -312,6 +316,10 @@ class Qrcode:
                     for i in range(len(block)):
                         _encode_block[i] = block[i]
                     _encode_data.append(_encode_block)
+
+                print(_encode_data)
+                # exit()
+
                 _encode_data = ''.join(bin(dec)[2:].zfill(8) for block in zip(*_encode_data) for dec in block)
                 _encode_data += '0' * remainder_bits[self.version]
                 return _encode_data
