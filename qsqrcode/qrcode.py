@@ -93,15 +93,15 @@ class Qrcode:
                                     = 1 if x_offset % 2 == 0 and y_offset % 2 == 0 or abs(x_offset) + abs(
                                     y_offset) == 3 else 0
 
-            def level_and_mask_build():
-                for format_i in range(len(format_info_str[self.level][self.mask_id])):
+            def level_and_mask_build(_mask_id):
+                for format_i in range(len(format_info_str[self.level][_mask_id])):
                     self.data_matrix[format_i if format_i < 6 else (
                         format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))][8] = int(
-                        format_info_str[self.level][self.mask_id][format_i])
+                        format_info_str[self.level][_mask_id][format_i])
                     self.data_matrix[8][format_i if format_i < 6 else (
                         format_i + 1 if format_i < 8 else self.length - 7 + (format_i - 8))] = int(
-                        format_info_str[self.level][self.mask_id][14 - format_i])
-                self.data_matrix[self.length - 8][8] = int(format_info_str[self.level][self.mask_id][7])
+                        format_info_str[self.level][_mask_id][14 - format_i])
+                self.data_matrix[self.length - 8][8] = int(format_info_str[self.level][_mask_id][7])
 
             def version_info_build():
                 if self.version > 6:
@@ -122,18 +122,38 @@ class Qrcode:
                     up = not up
 
             def mask():
+                def mask_template(col, row, _mask_id):
+                    if _mask_id == 0:
+                        return (col + row) % 2 == 0
+                    elif _mask_id == 1:
+                        return row % 2 == 0
+                    elif _mask_id == 2:
+                        return col % 3 == 0
+                    elif _mask_id == 3:
+                        return (row + col) % 3 == 0
+                    elif _mask_id == 4:
+                        return (row // 2 + col // 3) % 2 == 0
+                    elif _mask_id == 5:
+                        return ((row * col) % 2) + ((row * col) % 3) == 0
+                    elif _mask_id == 6:
+                        return (((row * col) % 2) + ((row * col) % 3)) % 2 == 0
+                    elif _mask_id == 7:
+                        return (((row + col) % 2) + ((row * col) % 3)) % 2 == 0
+                    else:
+                        return (col + row) % 2 == 0
+
                 def penalty(__matrix):
                     def cal_n3(___matrix):
                         _count = 0
                         check_word = ('00001011101', '10111010000')
                         for row in ___matrix:
-                            row_str = ''.join(row)
+                            row_str = ''.join(str(s) for s in row)
                             begin = 0
-                            while begin < len(row_str) and check_word[0] in row_str:
+                            while begin < len(row_str) and check_word[0] in row_str[begin:]:
                                 begin = row_str.index(check_word[0]) + len(check_word[0])
                                 _count += 1
                             begin = 0
-                            while begin < len(row_str) and check_word[1] in row_str:
+                            while begin < len(row_str) and check_word[1] in row_str[begin:]:
                                 begin = row_str.index(check_word[1]) + len(check_word[1])
                                 _count += 1
                         return _count
@@ -187,9 +207,13 @@ class Qrcode:
                     return n1 + n2 + n3 + n4
 
                 penalty_result = []
-                for i in range(8):
-                    # todo 掩码计算
-                    _matrix = []
+                for mask_id in range(8):
+                    level_and_mask_build(mask_id)
+                    _matrix = [[None] * self.length for _i in range(self.length)]
+                    for x in range(self.length):
+                        for y in range(self.length):
+                            if self.data_matrix[x][y] is not None:
+                                _matrix[x][y] = self.data_matrix[x][y] ^ mask_template(x, y, mask_id)
                     penalty_result.append(penalty(_matrix))
                 return penalty_result.index(min(penalty_result))
 
@@ -199,9 +223,9 @@ class Qrcode:
             build_locate_sign()
             build_alignment_sign()
             version_info_build()
-            self.mask_id = mask()
-            level_and_mask_build()
             data_build(encode_data)
+            self.mask_id = mask()
+            level_and_mask_build(self.mask_id)
 
         def draw():
             self.qrcode = Image.new('1', self.size, 1)
