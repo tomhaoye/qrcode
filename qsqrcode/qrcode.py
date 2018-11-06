@@ -19,8 +19,8 @@ class Qrcode:
     size = ()
 
     def resize(self, size):
-        self.qrcode.resize((size, size), Image.ANTIALIAS)
-        return self.qrcode
+        self.qrcode = self.qrcode.resize((size, size), Image.ANTIALIAS)
+        return self
 
     def generate(self, path):
         self.qrcode.save(path)
