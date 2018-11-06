@@ -28,13 +28,16 @@ class Qrcode:
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
-        message = message.encode() if self.version >= 3 else message
 
         def decide_version(_message, _level_index):
             if all(i in num_list for i in _message):
                 mode = 'numeric'
             elif all(i in alphanum_list for i in _message):
                 mode = 'alphanumeric'
+            elif all(ord(i) in range(0x4E00, 0x9FA6) for i in _message):
+                mode = 'zh_CN'
+            elif any(ord(i) in range(0x3040, 0x3100) for i in _message):
+                mode = 'kanji'
             else:
                 mode = 'byte'
             for each_version in range(40):
@@ -271,14 +274,55 @@ class Qrcode:
                     return diff_encode_code
 
                 def kanji_encode(___message):
-                    pass
+                    code = ''
+                    for i in ___message:
+                        data = i.encode('cp932')
+                        value = data[0] * 16 * 16 + data[1]
+                        if value in range(0x8140, 0x9FFD):
+                            value = value - 0x8140
+                            length = len(bin(value))
+                            high = bin(value)[2:length - 8]
+                            low = bin(value)[-8:]
+                            c = bin(int(high, 2) * 0xC0 + int(low, 2))[2:]
+                            c = '0' * (13 - len(c)) + c
+                            code += c
+                        elif value in range(0xE040, 0xEBC0):
+                            value = value - 0xC140
+                            length = len(bin(value))
+                            high = bin(value)[2:length - 8]
+                            low = bin(value)[-8:]
+                            c = bin(int(high, 2) * 0xC0 + int(low, 2))[2:]
+                            c = '0' * (13 - len(c)) + c
+                            code += c
+                    return code
 
+                def zh_cn_encode(___message):
+                    code = ''
+                    for i in ___message:
+                        data = i.encode('gb2312')
+                        value = data[0] * 16 * 16 + data[1]
+                        length = len(bin(value))
+                        high = int(bin(value)[2:length - 8], 2)
+                        low = int(bin(value)[-8:], 2)
+                        if high in range(0xA1, 0xAB) and low in range(0xA1, 0xFF):
+                            c = bin((high - 0xA1) * 0x60 + low - 0xA1)[2:]
+                            c = '0' * (13 - len(c)) + c
+                            code += c
+                        elif high in range(0xB0, 0xFB) and low in range(0xA1, 0xFF):
+                            c = bin((high - 0xA6) * 0x60 + low - 0xA1)[2:]
+                            c = '0' * (13 - len(c)) + c
+                            code += c
+                    return code
+
+                mode_encode = {
+                    'numeric': numeric_encode,
+                    'alphanumeric': alphanumeric_encode,
+                    'byte': byte_encode,
+                    'kanji': kanji_encode,
+                    'zh_CN': zh_cn_encode,
+                }
                 incomplete_codewords = mode_indicator_map[self.mode] + bin(len(__message))[2:].zfill(
-                    character_count_indicator_map[self.version][mode_map[self.mode]]) + (
-                                           numeric_encode(__message) if self.mode == 'numeric' else (
-                                               alphanumeric_encode(__message) if self.mode == 'alphanumeric' else (
-                                                   byte_encode(__message) if self.mode == 'byte' else kanji_encode(
-                                                       __message))))
+                    character_count_indicator_map[self.version][mode_map[self.mode]]) + mode_encode[self.mode](_message)
                 distance_to_8_multiple = 8 - (len(incomplete_codewords) % 8)
                 incomplete_codewords += '0' * distance_to_8_multiple
 

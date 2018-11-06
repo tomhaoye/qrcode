@@ -74,8 +74,8 @@ character_amount = {
           (2735, 1658, 1139, 701), (2927, 1774, 1219, 750), (3057, 1852, 1273, 784)]
 }
 
-mode_map = {'numeric': 0, 'alphanumeric': 1, 'byte': 2, 'kanji': 3}
-mode_indicator_map = {'numeric': '0001', 'alphanumeric': '0010', 'byte': '0100', 'kanji': '1000'}
+mode_map = {'numeric': 0, 'alphanumeric': 1, 'byte': 2, 'kanji': 3, 'zh_CN': 3}
+mode_indicator_map = {'numeric': '0001', 'alphanumeric': '0010', 'byte': '0100', 'kanji': '1000', 'zh_CN': '11010001'}
 
 character_count_indicator_map = [None, (10, 9, 8, 8), (10, 9, 8, 8), (10, 9, 8, 8), (10, 9, 8, 8),
                                  (10, 9, 8, 8), (10, 9, 8, 8), (10, 9, 8, 8), (10, 9, 8, 8), (10, 9, 8, 8),
