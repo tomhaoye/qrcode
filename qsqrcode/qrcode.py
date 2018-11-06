@@ -44,7 +44,6 @@ class Qrcode:
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
             self.mode = mode
-            print(self.version)
 
         def build_matrix(encode_data):
             def build_locate_sign():
@@ -300,29 +299,26 @@ class Qrcode:
                     data_block.append(_data_codewords[i:i + block_codecount[3]])
                     i += block_codecount[3]
 
-                print(data_block)
-
                 nsym = ecc_num_version_level_map[self.version][self.level]
                 gen = rs_generator_poly(nsym)
                 ecc_num = len(gen) - 1
-                _encode_data = []
+                _ecc_data = []
                 for block in data_block:
-                    _encode_block = block + [0] * ecc_num
+                    _data_block_get_ecc_block = block + [0] * ecc_num
                     for i in range(len(block)):
-                        coef = _encode_block[i]
+                        coef = _data_block_get_ecc_block[i]
                         if coef != 0:
                             for j in range(ecc_num + 1):
-                                _encode_block[i + j] ^= gf_mul(gen[j], coef)
-                    for i in range(len(block)):
-                        _encode_block[i] = block[i]
-                    _encode_data.append(_encode_block)
+                                _data_block_get_ecc_block[i + j] ^= gf_mul(gen[j], coef)
+                    _ecc_data.append(_data_block_get_ecc_block[len(block):])
 
-                print(_encode_data)
-                # exit()
-
-                _encode_data = ''.join(bin(dec)[2:].zfill(8) for block in zip(*_encode_data) for dec in block)
-                _encode_data += '0' * remainder_bits[self.version]
-                return _encode_data
+                _all_block_data = ''.join(bin(dec)[2:].zfill(8) for block in zip(*data_block) for dec in block)
+                # 突出部分补全
+                for block in data_block:
+                    if len(block) == block_codecount[3]:
+                        _all_block_data += bin(block[block_codecount[3] - 1])[2:].zfill(8)
+                _all_ecc_data = ''.join(bin(dec)[2:].zfill(8) for block in zip(*_ecc_data) for dec in block)
+                return _all_block_data + _all_ecc_data + '0' * remainder_bits[self.version]
 
             data_codewords = get_data_codewords(_message)
             return rs_encode(data_codewords)
