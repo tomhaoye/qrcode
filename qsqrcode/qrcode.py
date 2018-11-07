@@ -3,7 +3,7 @@ from PIL import Image
 from math import sqrt
 from reedsolo import rs_generator_poly, gf_mul
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
-    alphanum_list, character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
+    character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
     each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks, remainder_bits
 
 
@@ -41,7 +41,6 @@ class Qrcode:
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
             self.mode = mode
-            print(mode)
 
         def build_matrix(encode_data):
             def build_locate_sign():
@@ -249,67 +248,15 @@ class Qrcode:
                         diff_encode_code += bin(int(_equal_or_less_than_three_digits))[2:].zfill(respectively_len)
                     return diff_encode_code
 
-                def alphanumeric_encode(___message):
-                    diff_encode_code = ''
-                    trans_list = [alphanum_list.index(s) for s in ___message]
-                    for i in range(1, len(trans_list), 2):
-                        diff_encode_code += bin(trans_list[i - 1] * 45 + trans_list[i])[2:].zfill(11)
-                    return diff_encode_code if i == len(trans_list) - 1 else diff_encode_code + bin(trans_list[-1])[
-                                                                                                2:].zfill(6)
-
                 def byte_encode(___message):
                     diff_encode_code = ''
                     for b in ___message:
                         diff_encode_code += bin(b)[2:].zfill(8)
                     return diff_encode_code
 
-                def kanji_encode(___message):
-                    code = ''
-                    for i in ___message:
-                        data = i.encode('cp932')
-                        value = data[0] * 16 * 16 + data[1]
-                        if value in range(0x8140, 0x9FFD):
-                            value = value - 0x8140
-                            length = len(bin(value))
-                            high = bin(value)[2:length - 8]
-                            low = bin(value)[-8:]
-                            c = bin(int(high, 2) * 0xC0 + int(low, 2))[2:]
-                            c = '0' * (13 - len(c)) + c
-                            code += c
-                        elif value in range(0xE040, 0xEBC0):
-                            value = value - 0xC140
-                            length = len(bin(value))
-                            high = bin(value)[2:length - 8]
-                            low = bin(value)[-8:]
-                            c = bin(int(high, 2) * 0xC0 + int(low, 2))[2:]
-                            c = '0' * (13 - len(c)) + c
-                            code += c
-                    return code
-
-                def zh_cn_encode(___message):
-                    code = ''
-                    for i in ___message:
-                        data = i.encode('gb2312')
-                        value = data[0] * 16 * 16 + data[1]
-                        length = len(bin(value))
-                        high = int(bin(value)[2:length - 8], 2)
-                        low = int(bin(value)[-8:], 2)
-                        if high in range(0xA1, 0xAB) and low in range(0xA1, 0xFF):
-                            c = bin((high - 0xA1) * 0x60 + low - 0xA1)[2:]
-                            c = '0' * (13 - len(c)) + c
-                            code += c
-                        elif high in range(0xB0, 0xFB) and low in range(0xA1, 0xFF):
-                            c = bin((high - 0xA6) * 0x60 + low - 0xA1)[2:]
-                            c = '0' * (13 - len(c)) + c
-                            code += c
-                    return code
-
                 mode_encode = {
                     'numeric': numeric_encode,
-                    'alphanumeric': alphanumeric_encode,
                     'byte': byte_encode,
-                    'kanji': kanji_encode,
-                    'zh_CN': zh_cn_encode,
                 }
                 incomplete_codewords = mode_indicator_map[self.mode] + bin(len(__message))[2:].zfill(
                     character_count_indicator_map[self.version][mode_map[self.mode]]) + mode_encode[self.mode](_message)
