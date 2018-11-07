@@ -27,16 +27,11 @@ class Qrcode:
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
+        message = message.encode()
 
         def decide_version(_message, _level_index):
-            if all(i in num_list for i in _message):
+            if all(chr(i) in num_list for i in _message):
                 mode = 'numeric'
-            elif all(i in alphanum_list for i in _message):
-                mode = 'alphanumeric'
-            elif all(ord(i) in range(0x4E00, 0x9FA6) for i in _message):
-                mode = 'zh_CN'
-            elif any(ord(i) in range(0x3040, 0x3100) for i in _message):
-                mode = 'kanji'
             else:
                 mode = 'byte'
             for each_version in range(40):
@@ -46,6 +41,7 @@ class Qrcode:
             self.length = 21 + 4 * (self.version - 1)
             self.size = (self.length, self.length)
             self.mode = mode
+            print(mode)
 
         def build_matrix(encode_data):
             def build_locate_sign():
@@ -264,7 +260,7 @@ class Qrcode:
                 def byte_encode(___message):
                     diff_encode_code = ''
                     for b in ___message:
-                        diff_encode_code += bin(ord(b))[2:].zfill(8)
+                        diff_encode_code += bin(b)[2:].zfill(8)
                     return diff_encode_code
 
                 def kanji_encode(___message):
