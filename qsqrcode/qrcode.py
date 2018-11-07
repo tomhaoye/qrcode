@@ -8,7 +8,6 @@ from .constant import mode_map, level_map, format_info_str, version_info_str, al
 
 
 class Qrcode:
-    py_version = 3
     mode = None
     level = None
     qrcode = None
@@ -264,13 +263,8 @@ class Qrcode:
 
                 def byte_encode(___message):
                     diff_encode_code = ''
-                    if self.py_version > 3:
-                        ___message = ___message.encode()
-                        for ord_b in ___message:
-                            diff_encode_code += bin(ord_b)[2:].zfill(8)
-                    else:
-                        for b in ___message:
-                            diff_encode_code += bin(ord(b))[2:].zfill(8)
+                    for b in ___message:
+                        diff_encode_code += bin(ord(b))[2:].zfill(8)
                     return diff_encode_code
 
                 def kanji_encode(___message):
