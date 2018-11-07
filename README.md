@@ -44,10 +44,10 @@ qr.paint('pic/test.jpg').generate('testpic/test.png')
  
  
  ## 示例
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test0.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test1.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test2.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test3.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test4.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test5.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test2.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test3.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test0.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test1.png)
  
