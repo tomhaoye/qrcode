@@ -4,7 +4,8 @@ from math import sqrt
 from reedsolo import rs_generator_poly, gf_mul
 from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
-    each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks, remainder_bits
+    each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks, remainder_bits, \
+    img_mode_2_color_map
 
 
 class Qrcode:
@@ -17,13 +18,51 @@ class Qrcode:
     length = 0
     size = ()
 
+    def generate(self, path):
+        if self.qrcode is None:
+            self.matrix_to_img()
+        self.qrcode.save(path)
+        return
+
     def resize(self, size):
         self.qrcode = self.qrcode.resize((size, size), Image.ANTIALIAS)
         return self
 
-    def generate(self, path):
-        self.qrcode.save(path)
-        return
+    def matrix_to_img(self, img_mode='1', matrix=None):
+        self.qrcode = Image.new(img_mode, self.size, 1)
+        for x in range(self.length):
+            for y in range(self.length):
+                self.qrcode.putpixel((x, y), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
+                    y]) if matrix is None else matrix[x][y])
+
+    def paint(self, img=None, fg_or_bg=0):
+        matrix = [[None] * self.length for i in range(self.length)]
+        img_mode = 'RGBA'
+        if img:
+            img = Image.open(img)
+            img = img.resize(self.size, Image.ANTIALIAS)
+        else:
+            return self
+        for x in range(self.length):
+            for y in range(self.length):
+                if fg_or_bg == 0:
+                    matrix[x][y] = img.getpixel((x, y)) if img is not None and self.data_matrix[x][y] == 1 else img_mode_2_color_map[img_mode][0]
+                else:
+                    matrix[x][y] = img.getpixel((x, y)) if img is not None and self.data_matrix[x][y] == 0 else img_mode_2_color_map[img_mode][1]
+        self.matrix_to_img(img_mode, matrix)
+        return self
+
+    def colour(self, fg_color=None, bg_color=None):
+        img_mode = 'RGB'
+        matrix = [[None] * self.length for i in range(self.length)]
+        for x in range(self.length):
+            for y in range(self.length):
+                if self.data_matrix[x][y] == 1:
+                    matrix[x][y] = fg_color if fg_color is not None else img_mode_2_color_map[img_mode][1]
+                else:
+                    matrix[x][y] = bg_color if bg_color is not None else img_mode_2_color_map[img_mode][0]
+        self.matrix_to_img('RGB', matrix)
+        return self
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
@@ -232,12 +271,6 @@ class Qrcode:
             build_fix_sign()
             level_and_mask_build(self.mask_id)
 
-        def draw():
-            self.qrcode = Image.new('1', self.size, 1)
-            for x in range(self.length):
-                for y in range(self.length):
-                    self.qrcode.putpixel((x, y), 0 if self.data_matrix[x][y] else 1)
-
         def encode(_message):
             def get_data_codewords(__message):
                 def numeric_encode(___message):
@@ -306,4 +339,3 @@ class Qrcode:
 
         decide_version(message, level_index)
         build_matrix(encode(message))
-        draw()
