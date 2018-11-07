@@ -25,7 +25,9 @@ class Qrcode:
         return
 
     def resize(self, size):
-        self.qrcode = self.qrcode.resize((size, size), Image.ANTIALIAS)
+        if self.qrcode is None:
+            self.matrix_to_img()
+        self.qrcode = self.qrcode.resize((size, size), Image.NONE)
         return self
 
     def matrix_to_img(self, img_mode='1', matrix=None):
