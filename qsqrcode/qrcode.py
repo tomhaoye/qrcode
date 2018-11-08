@@ -55,6 +55,10 @@ class Qrcode:
         return self
 
     def colour(self, fg_color=None, bg_color=None):
+        if (fg_color is None or len(fg_color) != 7) and (bg_color is None or len(bg_color) != 7):
+            return self
+        fg_color = (int(fg_color[1:3], 16), int(fg_color[3:5], 16), int(fg_color[5:7], 16)) if fg_color else None
+        bg_color = (int(bg_color[1:3], 16), int(bg_color[3:5], 16), int(bg_color[5:7], 16)) if bg_color else None
         img_mode = 'RGB'
         matrix = [[None] * self.length for i in range(self.length)]
         for x in range(self.length):

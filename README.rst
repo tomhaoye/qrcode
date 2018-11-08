@@ -25,4 +25,4 @@ more usage
     from qsqrcode.qrcode import Qrcode
     qr = Qrcode('test it', 'H')
     qr.paint('pic/testbg.jpg').resize(250).generate('testpic/test1.png')
-    qr.colour((199, 29, 69)).resize(250).generate('testpic/test2.png')
+    qr.colour('#1294B8').resize(250).generate('testpic/test2.png')
