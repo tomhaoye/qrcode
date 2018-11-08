@@ -13,40 +13,40 @@ class Qrcode:
     level = None
     qrcode = None
     version = 1
+    img_mode = '1'
     data_matrix = None
     mask_id = None
     border = 0
     length = 0
     size = ()
+    re_size = None
 
     def generate(self, path):
         if self.qrcode is None:
-            self.matrix_to_img()
+            self._matrix_to_img()
         self.qrcode.save(path)
         return
 
     def resize(self, size):
+        self.re_size = size
         if self.qrcode is None:
-            self.matrix_to_img()
+            self._matrix_to_img()
         self.qrcode = self.qrcode.resize((size, size), Image.NONE)
         return self
 
     def set_border(self, border):
         self.border = abs(int(border))
+        if self.qrcode is not None and self.re_size is not None:
+            new_img = Image.new(self.img_mode, (self.re_size + 2*self.border, self.re_size + 2*self.border), img_mode_2_color_map[self.img_mode][0])
+            for x in range(self.re_size):
+                for y in range(self.re_size):
+                    new_img.putpixel((x + self.border, y + self.border), self.qrcode.getpixel((x, y)))
+            self.qrcode = new_img
         return self
-
-    def matrix_to_img(self, img_mode='1', matrix=None):
-        border = abs(int(self.border))
-        size = (self.length + 2 * border, self.length + 2 * border)
-        self.qrcode = Image.new(img_mode, size, 1)
-        for x in range(self.length):
-            for y in range(self.length):
-                self.qrcode.putpixel((x + border, y + border), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
-                    y]) if matrix is None else matrix[x][y])
 
     def paint(self, img=None, fg_or_bg=0):
         matrix = [[None] * self.length for i in range(self.length)]
-        img_mode = 'RGBA'
+        self.img_mode = img_mode = 'RGBA'
         if img:
             img = Image.open(img)
             img = img.resize(self.size, Image.ANTIALIAS)
@@ -58,7 +58,7 @@ class Qrcode:
                     matrix[x][y] = img.getpixel((x, y)) if img is not None and self.data_matrix[x][y] == 1 else img_mode_2_color_map[img_mode][0]
                 else:
                     matrix[x][y] = img.getpixel((x, y)) if img is not None and self.data_matrix[x][y] == 0 else img_mode_2_color_map[img_mode][1]
-        self.matrix_to_img(img_mode, matrix)
+        self._matrix_to_img(img_mode, matrix)
         return self
 
     def colour(self, fg_color=None, bg_color=None):
@@ -66,7 +66,7 @@ class Qrcode:
             return self
         fg_color = (int(fg_color[1:3], 16), int(fg_color[3:5], 16), int(fg_color[5:7], 16)) if fg_color else None
         bg_color = (int(bg_color[1:3], 16), int(bg_color[3:5], 16), int(bg_color[5:7], 16)) if bg_color else None
-        img_mode = 'RGB'
+        self.img_mode = img_mode = 'RGB'
         matrix = [[None] * self.length for i in range(self.length)]
         for x in range(self.length):
             for y in range(self.length):
@@ -74,8 +74,17 @@ class Qrcode:
                     matrix[x][y] = fg_color if fg_color is not None else img_mode_2_color_map[img_mode][1]
                 else:
                     matrix[x][y] = bg_color if bg_color is not None else img_mode_2_color_map[img_mode][0]
-        self.matrix_to_img('RGB', matrix)
+        self._matrix_to_img('RGB', matrix)
         return self
+
+    def _matrix_to_img(self, img_mode='1', matrix=None):
+        border = abs(int(self.border))
+        size = (self.length + 2 * border, self.length + 2 * border)
+        self.qrcode = Image.new(img_mode, size, img_mode_2_color_map[img_mode][0])
+        for x in range(self.length):
+            for y in range(self.length):
+                self.qrcode.putpixel((x + border, y + border), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
+                    y]) if matrix is None else matrix[x][y])
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]

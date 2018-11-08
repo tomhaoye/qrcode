@@ -18,3 +18,8 @@ qr.resize(250).generate('testpic/test4.png')
 qr = Qrcode('日本では「ノストラダムスの大予言」の名で知られる詩集を著した。彼の予言は、現在に至るまで多くの信奉者を生み出し、様々な論争を引き起こし다양한 사전 콘텐츠 제공, 발음듣기, 중국어 필기인식기, 보조사전, 내가 찾은 단어 제공', 'H')
 qr.resize(250).generate('testpic/test5.png')
 
+qr = Qrcode('测试一下set_border后resize', 'H')
+qr.set_border(2).resize(250).generate('testpic/test6.png')
+
+qr = Qrcode('测试一下resize后set_border', 'H')
+qr.resize(230).set_border(10).generate('testpic/test7.png')
