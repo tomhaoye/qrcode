@@ -52,4 +52,6 @@ qr.paint('pic/test.jpg').resize(250).generate('testpic/test.png')
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test3.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test0.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test1.png)
- 
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test6.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test7.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test8.png)
