@@ -39,7 +39,7 @@ python test.py
 from qsqrcode.qrcode import Qrcode
 
 qr = Qrcode('测试一下吧', 'H')
-qr.paint('pic/test.jpg').generate('testpic/test.png')
+qr.paint('pic/test.jpg').resize(250).generate('testpic/test.png')
 ```
  
  
