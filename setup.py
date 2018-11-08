@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qs-qrcode',
-      version='0.6',
+      version='0.7',
       author='Q',
       author_email='tomhaoye@gmail.com',
       description='generate qrcode',
@@ -17,7 +17,6 @@ setup(name='qs-qrcode',
           "Intended Audience :: Developers",
           "Operating System :: OS Independent",
           "License :: OSI Approved :: MIT License",
-          "Topic :: Text Processing :: Indexing",
           "Topic :: Multimedia :: Graphics",
           "Topic :: Software Development :: Libraries :: Python Modules",
           "Programming Language :: Python",
