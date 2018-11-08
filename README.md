@@ -27,7 +27,9 @@
  
  ## 安装
  
- > 还没能直接安装
+ ```bash
+sudo pip install qs-qrcode
+```
  
  ## 使用
  - 命令行
