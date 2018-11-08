@@ -23,3 +23,6 @@ qr.set_border(2).resize(250).generate('testpic/test6.png')
 
 qr = Qrcode('测试一下resize后set_border', 'H')
 qr.resize(230).set_border(10).generate('testpic/test7.png')
+
+qr = Qrcode('再看看如何', 'H')
+qr.paint('pic/test.jpg').resize(230).set_border(10).generate('testpic/test8.png')
