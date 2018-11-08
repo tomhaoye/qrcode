@@ -15,6 +15,7 @@ class Qrcode:
     version = 1
     data_matrix = None
     mask_id = None
+    border = 0
     length = 0
     size = ()
 
@@ -30,11 +31,17 @@ class Qrcode:
         self.qrcode = self.qrcode.resize((size, size), Image.NONE)
         return self
 
+    def set_border(self, border):
+        self.border = abs(int(border))
+        return self
+
     def matrix_to_img(self, img_mode='1', matrix=None):
-        self.qrcode = Image.new(img_mode, self.size, 1)
+        border = abs(int(self.border))
+        size = (self.length + 2 * border, self.length + 2 * border)
+        self.qrcode = Image.new(img_mode, size, 1)
         for x in range(self.length):
             for y in range(self.length):
-                self.qrcode.putpixel((x, y), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
+                self.qrcode.putpixel((x + border, y + border), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
                     y]) if matrix is None else matrix[x][y])
 
     def paint(self, img=None, fg_or_bg=0):
