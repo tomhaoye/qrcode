@@ -25,11 +25,14 @@ more usage
 
     from qsqrcode.qrcode import Qrcode
 
-    qr = Qrcode('填充图片', 'H')
-    qr.paint('pic/testbg.jpg').resize(250).generate('testpic/test1.png')
+    # Qrcode 的第二个参数，L ≈ 7%容错，M ≈ 15%容错，Q ≈ 25%容错，H ≈ 30%容错
+    Qrcode('test', 'L').generate('testpic/test7.png')
+    Qrcode('test', 'M').generate('testpic/test8.png')
+    Qrcode('test', 'Q').generate('testpic/test9.png')
+    Qrcode('test', 'H').generate('testpic/testA.png')
 
-    qr = Qrcode('填充颜色', 'H')
-    qr.colour('#1294B8').resize(250).generate('testpic/test2.png')
+    Qrcode('填充颜色', 'H').colour('#1294B8').resize(250).generate('testpic/test1.png')
 
-    qr = Qrcode('再看看如何加border', 'H')
-    qr.paint('pic/test.jpg').resize(230).set_border(10).generate('testpic/test3.png')
+    Qrcode('填充图片', 'H').paint('pic/testbg.jpg').resize(250).generate('testpic/test2.png')
+
+    Qrcode('再看看如何加border', 'H').paint('pic/test.jpg').resize(230).set_border(10).generate('testpic/test3.png')
