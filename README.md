@@ -62,6 +62,14 @@ Qrcode('测试一下吧').colour('#22AA66').generate('testpic/test4.png')
 Qrcode('测试一下吧').colour('#22AA66').resize(250).set_border(10).generate('testpic/test5.png')
 Qrcode('测试一下吧').paint('pic/test.jpg').resize(250).set_border(10).generate('testpic/test6.png')
 
+# 差点忘了 Qrcode 的第二个参数，L <= 7%容错，M <= 15%容错，Q <= 25%容错，H <= 30%容错
+Qrcode('测试一下吧', 'L').generate('testpic/test7.png')
+Qrcode('测试一下吧', 'M').generate('testpic/test8.png')
+Qrcode('测试一下吧', 'Q').generate('testpic/test9.png')
+Qrcode('测试一下吧', 'H').generate('testpic/testA.png')
+
+# 还有其他一些操作大家可以自行发觉:)
+
 ```
  
  
