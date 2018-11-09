@@ -25,6 +25,8 @@
  - Pillow
  - reedsolo
  
+ ```pip install -r requirements.txt```
+ 
  ## 安装
  
  ```bash
