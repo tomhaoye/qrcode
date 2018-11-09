@@ -36,3 +36,6 @@ more usage
     Qrcode('填充图片', 'H').paint('pic/testbg.jpg').resize(250).generate('testpic/test2.png')
 
     Qrcode('再看看如何加border', 'H').paint('pic/test.jpg').resize(230).set_border(10).generate('testpic/test3.png')
+
+    Qrcode('测试二维码中间加入图片', 'H').put_img_inside('pic/mystic.png').resize(375).generate('testpic/test4.png')
+

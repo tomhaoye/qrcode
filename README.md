@@ -68,6 +68,12 @@ Qrcode('测试一下吧', 'M').generate('testpic/test8.png')
 Qrcode('测试一下吧', 'Q').generate('testpic/test9.png')
 Qrcode('测试一下吧', 'H').generate('testpic/testA.png')
 
+# v0.9 添加二维码中间加入图片功能
+Qrcode('测试二维码中间加入图片', 'H').put_img_inside('pic/mystic.png').resize(375).generate('testpic/testB.png')
+Qrcode('测试图片填充二维码中间加入图片', 'H').paint('pic/test.jpg').put_img_inside('pic/mystic.png').resize(375).generate('testpic/testC.png')
+Qrcode('测试颜色填充二维码中间加入图片', 'H').colour('#882566').put_img_inside('pic/mystic.png').resize(375).generate('testpic/testD.png')
+Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('pic/mystic.png').resize(335).set_border(20).generate('testpic/testE.png')
+
 # 还有其他一些操作大家可以自行发觉:)
 
 ```
@@ -83,3 +89,7 @@ Qrcode('测试一下吧', 'H').generate('testpic/testA.png')
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test6.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test7.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test8.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test9.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testA.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testB.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testC.png)
