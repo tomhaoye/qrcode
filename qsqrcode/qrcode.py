@@ -44,14 +44,34 @@ class Qrcode:
             self.qrcode = new_img
         return self
 
-    def paint(self, img=None, fg_or_bg=0):
+    # 由于根据传入图片像素会改变二维码尺寸，如果想添加border请在调用该函数后使用resize调整大小，否则你的电脑风扇可能会很响:)
+    def put_img_inside(self, img_path):
+        self.img_mode = img_mode = 'RGBA'
+        if self.qrcode is None:
+            new_matrix = [[None] * self.length for i in range(self.length)]
+            for x in range(self.length):
+                for y in range(self.length):
+                    new_matrix[x][y] = img_mode_2_color_map[img_mode][self.data_matrix[x][y]]
+            self._matrix_to_img(img_mode, new_matrix)
+        else:
+            self.qrcode.convert(img_mode)
+        img = Image.open(img_path)
+        img_len = img.size[0]
+        enlarge_size = img_len * 4
+        self.resize(enlarge_size)
+        put_begin_xy = (enlarge_size - img_len + self.border) // 2
+        for x in range(img_len):
+            for y in range(img_len):
+                color = img.getpixel((x, y))
+                if color[3] > 0:
+                    self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
+        return self
+
+    def paint(self, img, fg_or_bg=0):
         matrix = [[None] * self.length for i in range(self.length)]
         self.img_mode = img_mode = 'RGBA'
-        if img:
-            img = Image.open(img)
-            img = img.resize(self.size, Image.ANTIALIAS)
-        else:
-            return self
+        img = Image.open(img)
+        img = img.resize(self.size, Image.ANTIALIAS)
         for x in range(self.length):
             for y in range(self.length):
                 if fg_or_bg == 0:
