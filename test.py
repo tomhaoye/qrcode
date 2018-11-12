@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from qsqrcode.qrcode import Qrcode
 
 
