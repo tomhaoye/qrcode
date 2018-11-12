@@ -74,7 +74,7 @@ Qrcode('测试图片填充二维码中间加入图片', 'H').paint('pic/test.jpg
 Qrcode('测试颜色填充二维码中间加入图片', 'H').colour('#882566').put_img_inside('pic/mystic.png').resize(375).generate('testpic/testD.png')
 Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('pic/mystic.png').resize(335).set_border(20).generate('testpic/testE.png')
 
-# 还有其他一些操作大家可以自行发觉:)
+# 还有其他一些操作大家可以自行挖掘:)
 
 ```
  
