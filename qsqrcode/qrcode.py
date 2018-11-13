@@ -20,11 +20,15 @@ class Qrcode:
     length = 0
     size = ()
     re_size = None
+    img_combine = False
 
     def generate(self, path):
         if self.qrcode is None:
             self._matrix_to_img()
-        self.qrcode.save(path)
+        if self.img_combine:
+            self.qrcode[0].save(path, save_all=True, append_images=self.qrcode, duration=100, loop=0)
+        else:
+            self.qrcode.save(path)
         return
 
     def resize(self, size):
@@ -70,7 +74,7 @@ class Qrcode:
     def paint(self, img, fg_or_bg=0):
         matrix = [[None] * self.length for i in range(self.length)]
         self.img_mode = img_mode = 'RGBA'
-        img = Image.open(img)
+        img = Image.open(img) if not self.img_combine else img
         img = img.resize(self.size, Image.ANTIALIAS)
         for x in range(self.length):
             for y in range(self.length):
@@ -79,6 +83,20 @@ class Qrcode:
                 else:
                     matrix[x][y] = img.getpixel((x, y)) if img is not None and self.data_matrix[x][y] == 0 else img_mode_2_color_map[img_mode][1]
         self._matrix_to_img(img_mode, matrix)
+        return self
+
+    def fill_gif(self, img_path):
+        img = Image.open(img_path)
+        if img.tile[0][0] != 'gif':
+            return self
+        self.img_combine = True
+        while True:
+            try:
+                seq = img.tell()
+                img.seek(seq + 1)
+                self.paint(img)
+            except EOFError:
+                break
         return self
 
     def colour(self, fg_color=None, bg_color=None):
@@ -100,11 +118,17 @@ class Qrcode:
     def _matrix_to_img(self, img_mode='1', matrix=None):
         border = abs(int(self.border))
         size = (self.length + 2 * border, self.length + 2 * border)
-        self.qrcode = Image.new(img_mode, size, img_mode_2_color_map[img_mode][0])
+        img = Image.new(img_mode, size, img_mode_2_color_map[img_mode][0])
         for x in range(self.length):
             for y in range(self.length):
-                self.qrcode.putpixel((x + border, y + border), (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][
-                    y]) if matrix is None else matrix[x][y])
+                img.putpixel((x + border, y + border),
+                             (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][y]) if matrix is None else
+                             matrix[x][y])
+        if self.img_combine:
+            self.qrcode = []
+            self.qrcode.append(img)
+        else:
+            self.qrcode = img
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
