@@ -35,7 +35,11 @@ class Qrcode:
         self.re_size = size
         if self.qrcode is None:
             self._matrix_to_img()
-        self.qrcode = self.qrcode.resize((size, size), Image.NONE)
+        if self.img_combine:
+            for qrcode_index in range(len(self.qrcode)):
+                self.qrcode[qrcode_index] = self.qrcode[qrcode_index].resize((size, size), Image.NONE)
+        else:
+            self.qrcode = self.qrcode.resize((size, size), Image.NONE)
         return self
 
     def set_border(self, border):
@@ -74,7 +78,7 @@ class Qrcode:
     def paint(self, img, fg_or_bg=0):
         matrix = [[None] * self.length for i in range(self.length)]
         self.img_mode = img_mode = 'RGBA'
-        img = Image.open(img) if not self.img_combine else img
+        img = Image.open(img)
         img = img.resize(self.size, Image.ANTIALIAS)
         for x in range(self.length):
             for y in range(self.length):
@@ -94,7 +98,8 @@ class Qrcode:
             try:
                 seq = img.tell()
                 img.seek(seq + 1)
-                self.paint(img)
+                img = img.convert('RGB')
+                # todo
             except EOFError:
                 break
         return self
