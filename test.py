@@ -34,4 +34,4 @@ Qrcode('测试颜色填充二维码中间加入图片', 'H').colour('#882566').p
 
 Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('pic/mystic.png').resize(160).set_border(10).generate('testpic/testC.png')
 
-Qrcode('gif试试看gif试试看gif试试看gif试试看', 'H').fill_gif('pic/pla.gif').resize(250).generate('testpic/testD.gif')
+Qrcode('gif试试看，但效果并不好看，而且暂不支持set_border', 'H').fill_gif('pic/pla.gif').resize(250).generate('testpic/testD.gif')
