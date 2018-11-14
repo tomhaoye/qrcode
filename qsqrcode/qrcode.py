@@ -93,15 +93,34 @@ class Qrcode:
         img = Image.open(img_path)
         if img.tile[0][0] != 'gif':
             return self
-        self.img_combine = True
+        if img.size[0] != img.size[1]:
+            raise Exception('please choose a square picture')
+        self.img_mode = img_mode = 'RGB'
+        size = img.size[0]
+        img_list = []
+        new_matrix = [[None] * self.length for i in range(self.length)]
+        for x in range(self.length):
+            for y in range(self.length):
+                new_matrix[x][y] = img_mode_2_color_map[img_mode][self.data_matrix[x][y]]
         while True:
             try:
                 seq = img.tell()
                 img.seek(seq + 1)
-                img = img.convert('RGB')
-                # todo
+                _gif = img.convert(img_mode)
+                self._matrix_to_img(img_mode, new_matrix)
+                self.resize(size)
+                for x in range(size):
+                    for y in range(size):
+                        qrcode_xy_value = self.qrcode.getpixel((x, y))
+                        gif_xy_value = _gif.getpixel((x, y))
+                        self.qrcode.putpixel((x, y), gif_xy_value)
+                        if (x - 2) % 5 == 0 and (y - 2) % 5 == 0:
+                            self.qrcode.putpixel((x, y), qrcode_xy_value)
+                img_list.append(self.qrcode)
             except EOFError:
                 break
+        self.qrcode = img_list
+        self.img_combine = True
         return self
 
     def colour(self, fg_color=None, bg_color=None):
@@ -129,11 +148,7 @@ class Qrcode:
                 img.putpixel((x + border, y + border),
                              (img_mode_2_color_map[img_mode][0] - self.data_matrix[x][y]) if matrix is None else
                              matrix[x][y])
-        if self.img_combine:
-            self.qrcode = []
-            self.qrcode.append(img)
-        else:
-            self.qrcode = img
+        self.qrcode = img
 
     def __init__(self, message, level_index='L'):
         self.level = level_map[level_index]
