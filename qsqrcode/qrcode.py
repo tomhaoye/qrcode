@@ -113,9 +113,9 @@ class Qrcode:
                     for y in range(size):
                         qrcode_xy_value = self.qrcode.getpixel((x, y))
                         gif_xy_value = _gif.getpixel((x, y))
-                        self.qrcode.putpixel((x, y), gif_xy_value)
-                        if (x - 2) % 5 == 0 and (y - 2) % 5 == 0:
-                            self.qrcode.putpixel((x, y), qrcode_xy_value)
+                        self.qrcode.putpixel((x, y), qrcode_xy_value)
+                        if gif_xy_value != img_mode_2_color_map[img_mode][0] and qrcode_xy_value != img_mode_2_color_map[img_mode][0]:
+                            self.qrcode.putpixel((x, y), gif_xy_value)
                 img_list.append(self.qrcode)
             except EOFError:
                 break

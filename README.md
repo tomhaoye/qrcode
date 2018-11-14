@@ -80,7 +80,7 @@ Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('
  
  
  ## 示例
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test4.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testD.gif)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test5.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test2.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test3.png)
