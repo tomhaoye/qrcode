@@ -21,12 +21,13 @@ class Qrcode:
     size = ()
     re_size = None
     img_combine = False
+    duration = 100
 
     def generate(self, path):
         if self.qrcode is None:
             self._matrix_to_img()
         if self.img_combine:
-            self.qrcode[0].save(path, save_all=True, append_images=self.qrcode, duration=100, loop=0)
+            self.qrcode[0].save(path, save_all=True, append_images=self.qrcode, duration=self.duration, loop=0)
         else:
             self.qrcode.save(path)
         return
@@ -93,6 +94,7 @@ class Qrcode:
         img = Image.open(img_path)
         if img.tile[0][0] != 'gif':
             return self
+        self.duration = img.info['duration']
         if img.size[0] != img.size[1]:
             raise Exception('please choose a square picture')
         self.img_mode = img_mode = 'RGB'
