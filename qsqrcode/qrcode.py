@@ -20,14 +20,15 @@ class Qrcode:
     length = 0
     size = ()
     re_size = None
-    img_combine = False
+    gif_qrcode = []
+    gif_combine = False
     duration = 100
 
     def generate(self, path):
         if self.qrcode is None:
             self._matrix_to_img()
-        if self.img_combine:
-            self.qrcode[0].save(path, save_all=True, append_images=self.qrcode, duration=self.duration, loop=0)
+        if self.gif_combine:
+            self.gif_qrcode[0].save(path, save_all=True, append_images=self.gif_qrcode, duration=self.duration, loop=0)
         else:
             self.qrcode.save(path)
         return
@@ -36,9 +37,9 @@ class Qrcode:
         self.re_size = size
         if self.qrcode is None:
             self._matrix_to_img()
-        if self.img_combine:
-            for qrcode_index in range(len(self.qrcode)):
-                self.qrcode[qrcode_index] = self.qrcode[qrcode_index].resize((size, size), Image.NONE)
+        if self.gif_combine:
+            for qrcode_index in range(len(self.gif_qrcode)):
+                self.gif_qrcode[qrcode_index] = self.gif_qrcode[qrcode_index].resize((size, size), Image.NONE)
         else:
             self.qrcode = self.qrcode.resize((size, size), Image.NONE)
         return self
@@ -121,8 +122,8 @@ class Qrcode:
                 img_list.append(self.qrcode)
             except EOFError:
                 break
-        self.qrcode = img_list
-        self.img_combine = True
+        self.gif_qrcode = img_list
+        self.gif_combine = True
         return self
 
     def colour(self, fg_color=None, bg_color=None):
