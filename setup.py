@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qs-qrcode',
-      version='1.0',
+      version='1.1',
       author='Q',
       author_email='tomhaoye@gmail.com',
       description='generate qrcode',
@@ -23,4 +23,9 @@ setup(name='qs-qrcode',
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: 3.6"
       ],
+      entry_points={
+          "console_scripts": [
+              "qsqrcode = qsqrcode.commandline:main"
+          ]
+      },
       zip_safe=False)
