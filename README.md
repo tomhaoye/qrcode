@@ -37,12 +37,17 @@ sudo pip install qs-qrcode
  - 命令行
 >使用`pip`安装该扩展高于或等于`1.1`版本
 ```bash
-qsqrcode -l H -w 编码内容 -p /home/tom/pic.png
+qsqrcode -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
 ```
 >如果你没有使用`pip`安装
 ```bash
-python qsqrcode.py -l H -w 编码内容 -p /home/tom/pic.png
+python qsqrcode.py -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
 ```
+>更多用法及解释
+```bash
+qsqrcode -h
+```
+
  - 文件引入
 ```python
 from qsqrcode.qrcode import Qrcode

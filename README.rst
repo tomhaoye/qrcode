@@ -9,6 +9,24 @@ install::
 usage
 =====
 
+use in cmd:
+
+.. code:: bash
+
+    qsqrcode -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
+
+or if you did not install with pip:
+
+.. code:: bash
+
+    python qsqrcode.py -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
+
+and for more usage:
+
+.. code:: bash
+
+    qsqrcode -h
+
 use in python:
 
 .. code:: python

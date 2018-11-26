@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='qs-qrcode',
-      version='1.1',
+      version='1.2',
       author='Q',
       author_email='tomhaoye@gmail.com',
       description='generate qrcode',
