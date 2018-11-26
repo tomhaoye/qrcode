@@ -2,7 +2,7 @@
 from PIL import Image
 from math import sqrt
 from reedsolo import rs_generator_poly, gf_mul
-from .constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
+from qsqrcode.constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
     each_version_required_bytes, num_of_error_correction_blocks_2_error_correction_per_blocks, remainder_bits, \
     img_mode_2_color_map
