@@ -35,9 +35,13 @@ sudo pip install qs-qrcode
  
  ## 使用
  - 命令行
- > 暂时可以通过修改`test.py`文件进行生成，如果想要支持命令行生成，请耐心等待`:)`
+>使用`pip`安装该扩展高于或等于`1.1`版本
 ```bash
-python test.py 
+qsqrcode -l H -w 编码内容 -p /home/tom/pic.png
+```
+>如果你没有使用`pip`安装
+```bash
+python qsqrcode.py -l H -w 编码内容 -p /home/tom/pic.png
 ```
  - 文件引入
 ```python
