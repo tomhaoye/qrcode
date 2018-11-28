@@ -23,13 +23,14 @@
  - Pillow
  - reedsolo
  
- ```bash
- sudo pip install -r requirements.txt
- ```
+```bash
+# 如果使用pip安装扩展可免去该步骤
+sudo pip install -r requirements.txt
+```
  
  ## 安装
  
- ```bash
+```bash
 sudo pip install qs-qrcode
 ```
  
@@ -39,7 +40,7 @@ sudo pip install qs-qrcode
 ```bash
 qsqrcode -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
 ```
->如果你没有使用`pip`安装
+>如果你只克隆了项目而没有使用`pip`安装扩展
 ```bash
 python qsqrcode.py -l H -m 唱歌不如跳舞 -s 400 -b 20 -c #569932
 ```
