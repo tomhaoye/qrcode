@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from PIL import Image
 from math import sqrt
+from PIL import ImageEnhance
 from reedsolo import rs_generator_poly, gf_mul
 from qsqrcode.constant import mode_map, level_map, format_info_str, version_info_str, alignment_location, num_list, \
     character_amount, ecc_num_version_level_map, mode_indicator_map, character_count_indicator_map, \
@@ -75,6 +76,35 @@ class Qrcode:
                 color = img.getpixel((x, y))
                 if color[3] > 0:
                     self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
+        return self
+
+    def combine(self, qr_name, bg_name, colorized=False, contrast=1.0, brightness=1.0):
+        qr = Image.open(qr_name)
+        qr = qr.convert('RGBA') if colorized else qr
+        bg0 = Image.open(bg_name).convert('RGBA')
+        bg0 = ImageEnhance.Contrast(bg0).enhance(contrast)
+        bg0 = ImageEnhance.Brightness(bg0).enhance(brightness)
+        if bg0.size[0] < bg0.size[1]:
+            bg0 = bg0.resize((qr.size[0] - 24, (qr.size[0] - 24) * int(bg0.size[1] / bg0.size[0])))
+        else:
+            bg0 = bg0.resize(((qr.size[1] - 24) * int(bg0.size[0] / bg0.size[1]), qr.size[1] - 24))
+        bg = bg0 if colorized else bg0.convert('1')
+        alignments = []
+        if self.version > 1:
+            a_loc = alignment_location[self.version - 2]
+            for a in range(len(a_loc)):
+                for b in range(len(a_loc)):
+                    if not ((a == b == 0) or (a == len(a_loc) - 1 and b == 0) or (a == 0 and b == len(a_loc) - 1)):
+                        for i in range(3 * (a_loc[a] - 2), 3 * (a_loc[a] + 3)):
+                            for j in range(3 * (a_loc[b] - 2), 3 * (a_loc[b] + 3)):
+                                alignments.append((i, j))
+        for i in range(qr.size[0] - 24):
+            for j in range(qr.size[1] - 24):
+                if not ((i in (18, 19, 20)) or (j in (18, 19, 20)) or (i < 24 and j < 24) or (
+                        i < 24 and j > qr.size[1] - 49) or (i > qr.size[0] - 49 and j < 24) or (
+                                (i, j) in alignments) or (i % 3 == 1 and j % 3 == 1) or (bg0.getpixel((i, j))[3] == 0)):
+                    qr.putpixel((i + 12, j + 12), bg.getpixel((i, j)))
+        self.qrcode = qr
         return self
 
     def paint(self, img, fg_or_bg=0):
