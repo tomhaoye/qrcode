@@ -100,7 +100,11 @@ class Qrcode:
         for x in range(img_len):
             for y in range(img_len):
                 color = img.getpixel((x, y))
-                if color[3] > 0:
+                if len(color) > 3 and color[3] > 0:
+                    self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
+                elif len(color) > 2 and color < (100, 100, 100):
+                    self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
+                elif color is int and color < 100:
                     self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
         return self
 
