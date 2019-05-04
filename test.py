@@ -37,4 +37,4 @@ Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('
 Qrcode('gif试试看，但效果并不好看，而且暂不支持set_border', 'H').fill_gif('pic/pla.gif').resize(250).generate('testpic/testD.gif')
 Qrcode('gif试试看，但效果并不好看，而且暂不支持set_border', 'H').fill_gif('pic/bounce.gif').resize(250).generate('testpic/testE.gif')
 
-Qrcode('插入图片的艺术化二维码', 'Q').resize(250).combine('pic/testbg.jpg').generate('testpic/testF.png')
+Qrcode('插入图片的艺术化二维码', 'Q').resize(250).combine('pic/test1.jpg').generate('testpic/testF.png')

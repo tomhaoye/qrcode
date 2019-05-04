@@ -24,14 +24,14 @@ class Qrcode:
     gif_combine = False
     duration = 100
 
-    def combine(self, bg_path, colorized=False):
+    def combine(self, bg_path):
         location_sign_length = int(location_sign_fix_len / self.length * self.re_size)
         version_info_length = int(version_info_fix_len / self.length * self.re_size)
         one_unit_length = int(1 / self.length * self.re_size)
         self.length = self.qrcode.size[0]
         bg_combine = Image.open(bg_path).convert('RGBA')
         bg_combine = bg_combine.resize((self.length, self.length))
-        bg = bg_combine if colorized else bg_combine.convert('1')
+        bg_combine = bg_combine.convert('1')
         if bg_combine.size[0] < bg_combine.size[1]:
             bg_combine = bg_combine.resize((self.length, self.length * int(bg_combine.size[1] / bg_combine.size[0])))
         else:
@@ -43,8 +43,11 @@ class Qrcode:
                         and (y not in range(self.length - location_sign_length - version_info_length, self.length) or x not in range(0, location_sign_length)) \
                         and (x not in range(location_sign_length - one_unit_length, location_sign_length)) \
                         and (y not in range(location_sign_length - one_unit_length, location_sign_length)) \
-                        and (x % 3 == 1 and y % 3 == 1) or (bg_combine.getpixel((x, y))[3] == 0):
-                    self.qrcode.putpixel((x, y), bg.getpixel((x, y)))
+                        and (x % 2 == 1 and y % 2 == 1) and (bg_combine.getpixel((x, y)) != 255):
+                    if self.qrcode.getpixel((x, y)) == 0:
+                        self.qrcode.putpixel((x, y), 255)
+                    else:
+                        self.qrcode.putpixel((x, y), bg_combine.getpixel((x, y)))
         self.qrcode = self.qrcode
         return self
 
