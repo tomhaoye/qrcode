@@ -94,15 +94,16 @@ class Qrcode:
             self.qrcode.convert(img_mode)
         img = Image.open(img_path)
         img_len = img.size[0]
+        img = img.resize((img_len, img_len))
         enlarge_size = img_len * 4
         self.resize(enlarge_size)
         put_begin_xy = (enlarge_size - img_len + self.border) // 2
         for x in range(img_len):
             for y in range(img_len):
                 color = img.getpixel((x, y))
-                if len(color) > 3 and color[3] > 0:
+                if len(color) == 4 and color[3] > 0:
                     self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
-                elif len(color) > 2 and color < (100, 100, 100):
+                elif len(color) == 3 and color < (100, 100, 100):
                     self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
                 elif color is int and color < 100:
                     self.qrcode.putpixel((x + put_begin_xy, y + put_begin_xy), color)
