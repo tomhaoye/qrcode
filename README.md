@@ -93,7 +93,7 @@ Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testD.gif)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test5.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test2.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test3.png)
+ ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testF.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test0.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test1.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test6.png)
