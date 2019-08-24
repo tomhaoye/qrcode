@@ -1,6 +1,13 @@
 # 二维码生成器（QRCode generator）
 
-可用于生成普通黑白二维码、彩色二维码、带背景图片的二维码，在微信扫码等主流扫码器中支持所有语言的识别。
+<p>
+<a href="#"><img src="https://img.shields.io/github/languages/top/tomhaoye/qrcode" alt="lang"></a>
+<a href="#"><img src="https://img.shields.io/badge/Python->=3-green.svg" alt="limit"></a>
+<a href="#"><img src="https://img.shields.io/github/languages/code-size/tomhaoye/qrcode" alt="size"></a>
+<a href="#"><img src="https://img.shields.io/github/last-commit/tomhaoye/qrcode" alt="last"></a>
+<a href="#"><img src="https://img.shields.io/pypi/dm/qs-qrcode" alt="download"></a>
+<a href="#"><img src="https://img.shields.io/github/license/tomhaoye/qrcode" alt="license"></a>
+</p>
 
 ## 书签
 
@@ -96,10 +103,3 @@ Qrcode('测试二维码中间加入图片后添加border', 'H').put_img_inside('
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testF.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test0.png)
  ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test1.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test6.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test7.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test8.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/test9.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testA.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testB.png)
- ![](https://raw.githubusercontent.com/tomhaoye/qrcode/master/testpic/testC.png)
